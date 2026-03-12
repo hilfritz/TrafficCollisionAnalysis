@@ -1,16 +1,6 @@
-# src/cleaning.py
 import pandas as pd
 
-
-# Placeholder neighbourhood values observed in the dataset.
-# These represent unknown or unassigned locations and should
-# be treated as missing values during cleaning.
-PLACEHOLDER_NEIGHBOURHOODS = {"NSA", "", "UNKNOWN", "N/A", "NONE"}
-
-
-# Columns that must be numeric for analysis.
-# These fields are used in time analysis and spatial analysis.
-NUMERIC_COLUMNS = ["OCC_YEAR", "OCC_HOUR", "LAT_WGS84", "LONG_WGS84"]
+from .config import NUMERIC_COLUMNS, PLACEHOLDER_NEIGHBOURHOODS
 
 
 def convert_occ_date(df: pd.DataFrame) -> pd.DataFrame:
@@ -41,7 +31,6 @@ def convert_numeric_columns(df: pd.DataFrame) -> pd.DataFrame:
     result = df.copy()
 
     for col in NUMERIC_COLUMNS:
-
         # Convert values to numeric
         # Invalid values are converted to NaN
         result[col] = pd.to_numeric(result[col], errors="coerce")
@@ -61,9 +50,9 @@ def normalize_neighbourhood_values(df: pd.DataFrame) -> pd.DataFrame:
     # Normalize text formatting
     result["NEIGHBOURHOOD_158"] = (
         result["NEIGHBOURHOOD_158"]
-        .fillna("")              # Replace missing values temporarily
-        .astype(str)             # Ensure string operations are possible
-        .str.strip()             # Remove extra spaces
+        .fillna("")
+        .astype(str)
+        .str.strip()
     )
 
     # Replace placeholder values with missing values
@@ -108,8 +97,7 @@ def clean_collision_data(df: pd.DataFrame) -> pd.DataFrame:
     a series of data cleaning and validation steps.
 
     Cleaning operations performed
-    -------------------------------
-
+    -----------------------------
     1. Remove duplicate records
        - Exact duplicate rows are removed to prevent double counting.
 
@@ -154,7 +142,6 @@ def clean_collision_data(df: pd.DataFrame) -> pd.DataFrame:
     pandas.DataFrame
         Cleaned dataset ready for analytics and visualization.
     """
-
     result = df.copy()
 
     # Remove duplicate records to prevent double counting
@@ -183,7 +170,6 @@ def print_data_quality_report(report: dict) -> None:
     """
     Print a formatted summary of dataset quality issues.
     """
-
     print("\nDATA QUALITY REPORT")
     print("---------------------------")
     print(f"Total rows: {report['total_rows']}")
@@ -202,7 +188,6 @@ def generate_data_quality_report(df: pd.DataFrame) -> dict:
 
     This helps analysts understand dataset limitations.
     """
-
     report = {}
 
     # Total number of rows in the dataset

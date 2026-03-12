@@ -1,6 +1,8 @@
 from pathlib import Path
 import pandas as pd
 
+from .config import REQUIRED_COLUMNS
+
 
 # List of required columns expected in the Toronto collision dataset.
 # These columns are required for later analysis steps such as:
@@ -8,23 +10,6 @@ import pandas as pd
 # - neighbourhood risk ranking
 # - severity analysis
 # - road user involvement analysis
-REQUIRED_COLUMNS = [
-    "EVENT_UNIQUE_ID",
-    "OCC_DATE",
-    "OCC_YEAR",
-    "OCC_HOUR",
-    "DIVISION",
-    "FATALITIES",
-    "INJURY_COLLISIONS",
-    "PD_COLLISIONS",
-    "NEIGHBOURHOOD_158",
-    "LONG_WGS84",
-    "LAT_WGS84",
-    "AUTOMOBILE",
-    "MOTORCYCLE",
-    "BICYCLE",
-    "PEDESTRIAN",
-]
 
 
 def validate_required_columns(df: pd.DataFrame) -> None:
@@ -44,7 +29,6 @@ def validate_required_columns(df: pd.DataFrame) -> None:
     ValueError
         If one or more required columns are missing.
     """
-
     # Identify columns that are missing from the dataset
     missing_columns = [col for col in REQUIRED_COLUMNS if col not in df.columns]
 
@@ -80,7 +64,6 @@ def load_dataset(file_path: str | Path) -> pd.DataFrame:
     ValueError
         If the dataset is missing required columns.
     """
-
     # Convert input path to a Path object for safer file handling
     path = Path(file_path)
 
