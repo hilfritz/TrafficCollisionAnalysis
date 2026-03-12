@@ -710,7 +710,7 @@ refactor(US-06): improve validation logic
 
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
-| Hilfritz Camallere | `hilfritz` | 1 | 0 | 20 | 2382 | 0 | Active contributor |
+| Hilfritz Camallere | `hilfritz` | 1 | 0 | 20 | 2349 | 0 | Active contributor |
 | Ananya Mandal | `AnanyaMandal-DataAnalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 | Daniyal Khan | `daniyalnkh` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 | Joseph Jamoralin | `Joseph-dataanalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
@@ -719,7 +719,7 @@ refactor(US-06): improve validation logic
 
 | Contributor | Commits | Files Changed | Insertions | Deletions |
 |-------------|---------|---------------|------------|-----------|
-| Hilfritz | 1 | 20 | 2382 | 0 |
+| Hilfritz | 1 | 20 | 2349 | 0 |
 
 ### Commit Type Distribution
 
