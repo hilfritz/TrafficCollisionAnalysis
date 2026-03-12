@@ -63,9 +63,32 @@ def collisions_by_hour(df: pd.DataFrame) -> pd.DataFrame:
 def collisions_by_neighbourhood(df: pd.DataFrame, top_n: int = 10) -> pd.DataFrame:
     """
     Rank neighbourhoods by collision frequency.
+
+    This function supports location-based safety analysis by identifying
+    which neighbourhoods have the highest number of recorded collisions.
+
+    Cleaning assumptions:
+    - rows with missing NEIGHBOURHOOD_158 are excluded
+    - results are sorted by highest collision count first
+    - output can be limited to the top_n neighbourhoods
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Cleaned collision dataset.
+    top_n : int, default=10
+        Number of top neighbourhoods to return.
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame with:
+        - NEIGHBOURHOOD_158
+        - collision_count
     """
     _require_columns(df, ["NEIGHBOURHOOD_158"])
 
+    # Remove rows where neighbourhood is missing before grouping
     result = (
         df.dropna(subset=["NEIGHBOURHOOD_158"])
         .groupby("NEIGHBOURHOOD_158")
