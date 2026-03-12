@@ -710,7 +710,7 @@ refactor(US-06): improve validation logic
 
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
-| Hilfritz Camallere | `hilfritz` | 1 | 0 | 20 | 2428 | 0 | Active contributor |
+| Hilfritz Camallere | `hilfritz` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 | Ananya Mandal | `AnanyaMandal-DataAnalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 | Daniyal Khan | `daniyalnkh` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 | Joseph Jamoralin | `Joseph-dataanalyst ` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
@@ -719,7 +719,7 @@ refactor(US-06): improve validation logic
 
 | Contributor | Commits | Files Changed | Insertions | Deletions |
 |-------------|---------|---------------|------------|-----------|
-| Hilfritz Camallere | 1 | 20 | 2428 | 0 |
+| Hilfritz Camallere | 0 | 0 | 0 | 0 |
 | Ananya Mandal | 0 | 0 | 0 | 0 |
 | Daniyal Khan | 0 | 0 | 0 | 0 |
 | Joseph Jamoralin | 0 | 0 | 0 | 0 |
@@ -728,7 +728,7 @@ refactor(US-06): improve validation logic
 
 | Type | Count |
 |------|------:|
-| other | 1 |
+| docs | 1 |
 
 ### File Metrics
 
