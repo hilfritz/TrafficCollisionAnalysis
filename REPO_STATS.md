@@ -1,6 +1,6 @@
 ## Repository Statistics
 
-**Total Commits:** 42  
+**Total Commits:** 44  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -8,7 +8,7 @@
 
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
-| Hilfritz Camallere | `hilfritz` | 32 | 8 | 43 | 2710 | 196 | Active contributor |
+| Hilfritz Camallere | `hilfritz` | 33 | 9 | 43 | 2710 | 196 | Active contributor |
 | Ananya Mandal | `AnanyaMandal-DataAnalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 | Daniyal Khan | `daniyalnkh` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 | Joseph Jamoralin | `Joseph-dataanalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
@@ -17,7 +17,7 @@
 
 | Contributor | Commits | Files Changed | Insertions | Deletions |
 |-------------|---------|---------------|------------|-----------|
-| Hilfritz Camallere | 32 | 43 | 2710 | 196 |
+| Hilfritz Camallere | 33 | 43 | 2710 | 196 |
 | Ananya Mandal | 0 | 0 | 0 | 0 |
 | Daniyal Khan | 0 | 0 | 0 | 0 |
 | Joseph Jamoralin | 0 | 0 | 0 | 0 |
@@ -26,10 +26,10 @@
 
 | Type | Count |
 |------|------:|
-| docs | 15 |
+| docs | 16 |
 | feat | 3 |
 | fix | 4 |
-| other | 14 |
+| other | 15 |
 | refactor | 4 |
 | test | 2 |
 
@@ -44,16 +44,17 @@
 
 ### Branch List
 
-- `fix/US-01-actions-test`
+- `main`
 
 ### Pull Request Statistics
 
-**Total Pull Requests:** 8  
-**Merged Pull Requests:** 8  
+**Total Pull Requests:** 9  
+**Merged Pull Requests:** 9  
 **Open Pull Requests:** 0
 
 | PR # | Title | State | Author |
 |------|-------|-------|--------|
+| 9 | US-01: Fix CI workflow for repository statistics generation | MERGED | hilfritz |
 | 8 | US-01: Fix repository statistics workflow history depth | MERGED | hilfritz |
 | 7 | US-01: Fix team mapping in repository statistics generation | MERGED | hilfritz |
 | 6 | US-01: Add GitHub Actions workflow for automated repository statistics | MERGED | hilfritz |
