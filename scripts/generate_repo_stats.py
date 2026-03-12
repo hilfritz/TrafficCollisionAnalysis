@@ -11,7 +11,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT_MD = PROJECT_ROOT / "REPO_STATS.md"
 
 # Official team roster
-# git_names must match the actual output of:
+# git_names should match the real output of:
 # git log --format="%an" | sort | uniq -c
 TEAM_MEMBERS = [
     {
@@ -31,10 +31,14 @@ TEAM_MEMBERS = [
     },
     {
         "name": "Joseph Jamoralin",
-        "github": "Joseph-dataanalyst ",
+        "github": "",
         "git_names": ["Joseph Jamoralin"],
     },
 ]
+
+
+def normalize_text(value: str) -> str:
+    return value.strip().lower()
 
 
 def run_command(command: list[str], check: bool = True) -> str:
@@ -234,26 +238,42 @@ def get_pr_counts_by_author(prs: list[dict]) -> dict[str, int]:
     counts = Counter()
 
     for pr in prs:
-        author = ""
-        if isinstance(pr.get("author"), dict):
-            author = pr["author"].get("login", "")
-        if author:
-            counts[author] += 1
+        author = pr.get("author")
+
+        if isinstance(author, dict):
+            login = normalize_text(author.get("login", ""))
+            if login:
+                counts[login] += 1
 
     return dict(counts)
 
 
 def build_git_name_to_member_map() -> dict[str, str]:
     """
-    Build a lookup:
-        Git author name -> official team member name
+    Build a case-insensitive lookup:
+        contributor identifier -> official team member name
+
+    Supports matching by:
+    - official team member name
+    - github username
+    - git_names aliases
     """
     mapping = {}
 
     for member in TEAM_MEMBERS:
         official_name = member["name"]
+
+        # Match official name
+        mapping[normalize_text(member["name"])] = official_name
+
+        # Match GitHub username
+        github_name = member.get("github", "")
+        if github_name:
+            mapping[normalize_text(github_name)] = official_name
+
+        # Match git aliases
         for git_name in member.get("git_names", []):
-            mapping[git_name] = official_name
+            mapping[normalize_text(git_name)] = official_name
 
     return mapping
 
@@ -268,6 +288,7 @@ def build_team_contribution_summary(
     - All official team members are included
     - Team members with no contributions still appear with 0 values
     - Non-team contributors such as github-actions are excluded
+    - Matching is case-insensitive across name / github / git_names
     """
     git_name_to_member = build_git_name_to_member_map()
     pr_counts = get_pr_counts_by_author(pr_stats["prs"]) if pr_stats["available"] else {}
@@ -281,15 +302,15 @@ def build_team_contribution_summary(
             "files_changed": 0,
             "insertions": 0,
             "deletions": 0,
-            "prs": pr_counts.get(member["github"], 0) if member["github"] else 0,
+            "prs": 0,
             "status": "No contributions yet",
         }
         for member in TEAM_MEMBERS
     }
 
-    # Merge real git contributor stats into the matching team member
+    # Merge Git contributor statistics into matching team member
     for contributor in contributors:
-        raw_name = contributor["name"]
+        raw_name = normalize_text(contributor["name"])
 
         # Ignore non-team contributors like github-actions
         if raw_name not in git_name_to_member:
@@ -303,8 +324,23 @@ def build_team_contribution_summary(
         row["insertions"] += contributor["insertions"]
         row["deletions"] += contributor["deletions"]
 
-    # Update contribution status
-    for row in summary_lookup.values():
+    # Merge PR counts using github + official name as possible keys
+    for member in TEAM_MEMBERS:
+        official_name = member["name"]
+        row = summary_lookup[official_name]
+
+        possible_pr_keys = {
+            normalize_text(member.get("github", "")),
+            normalize_text(member.get("name", "")),
+        }
+
+        for alias in member.get("git_names", []):
+            possible_pr_keys.add(normalize_text(alias))
+
+        for key in possible_pr_keys:
+            if key:
+                row["prs"] += pr_counts.get(key, 0)
+
         if row["commits"] > 0 or row["prs"] > 0:
             row["status"] = "Active contributor"
 
@@ -318,7 +354,8 @@ def build_filtered_contributor_statistics(
     Return contributor statistics restricted to official team members only.
 
     - Removes bot/system contributors such as github-actions
-    - Merges multiple git aliases into the official team member name
+    - Merges multiple aliases into the official team member name
+    - Matching is case-insensitive across name / github / git_names
     """
     git_name_to_member = build_git_name_to_member_map()
 
@@ -334,7 +371,7 @@ def build_filtered_contributor_statistics(
     }
 
     for contributor in contributors:
-        raw_name = contributor["name"]
+        raw_name = normalize_text(contributor["name"])
 
         # Skip anything not mapped to a team member
         if raw_name not in git_name_to_member:
