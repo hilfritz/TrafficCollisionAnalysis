@@ -702,7 +702,7 @@ refactor(US-06): improve validation logic
 <!-- REPO-STATS:START -->
 ## Repository Statistics
 
-**Total Commits:** 36  
+**Total Commits:** 39  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -710,16 +710,16 @@ refactor(US-06): improve validation logic
 
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
-| Hilfritz Camallere | `hilfritz` | 28 | 0 | 40 | 2643 | 174 | Active contributor |
+| Hilfritz Camallere | `hilfritz` | 30 | 8 | 42 | 2709 | 195 | Active contributor |
 | Ananya Mandal | `AnanyaMandal-DataAnalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 | Daniyal Khan | `daniyalnkh` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
-| Joseph Jamoralin | `Joseph-dataanalyst ` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
+| Joseph Jamoralin | - | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 
 ### Contributor Statistics
 
 | Contributor | Commits | Files Changed | Insertions | Deletions |
 |-------------|---------|---------------|------------|-----------|
-| Hilfritz Camallere | 28 | 40 | 2643 | 174 |
+| Hilfritz Camallere | 30 | 42 | 2709 | 195 |
 | Ananya Mandal | 0 | 0 | 0 | 0 |
 | Daniyal Khan | 0 | 0 | 0 | 0 |
 | Joseph Jamoralin | 0 | 0 | 0 | 0 |
@@ -728,10 +728,10 @@ refactor(US-06): improve validation logic
 
 | Type | Count |
 |------|------:|
-| docs | 12 |
+| docs | 13 |
 | feat | 3 |
-| fix | 3 |
-| other | 12 |
+| fix | 4 |
+| other | 13 |
 | refactor | 4 |
 | test | 2 |
 
@@ -750,7 +750,20 @@ refactor(US-06): improve validation logic
 
 ### Pull Request Statistics
 
-GitHub PR statistics are unavailable. Install and authenticate GitHub CLI with `gh auth login` to enable this section.
+**Total Pull Requests:** 8  
+**Merged Pull Requests:** 8  
+**Open Pull Requests:** 0
+
+| PR # | Title | State | Author |
+|------|-------|-------|--------|
+| 8 | US-01: Fix repository statistics workflow history depth | MERGED | hilfritz |
+| 7 | US-01: Fix team mapping in repository statistics generation | MERGED | hilfritz |
+| 6 | US-01: Add GitHub Actions workflow for automated repository statistics | MERGED | hilfritz |
+| 5 | US-01: Add GitHub Actions workflow for automated repository statistics | MERGED | hilfritz |
+| 4 | US-01: Add repository statistics automation for README documentation | MERGED | hilfritz |
+| 3 | US-05: Implement collision data cleaning | MERGED | hilfritz |
+| 2 | US-04: Load dataset | MERGED | hilfritz |
+| 1 | US-01: Project repository setup | MERGED | hilfritz |
 
 <!-- REPO-STATS:END -->
 ---
