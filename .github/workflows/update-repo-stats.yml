@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - fix/US-01-actions-test
   schedule:
     - cron: "0 3 * * *"
   workflow_dispatch:
@@ -43,7 +44,7 @@ jobs:
           python scripts/update_readme_stats.py
 
       - name: Commit updated stats
-        if: github.actor != 'github-actions'
+        if: github.actor != 'github-actions[bot]'
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
