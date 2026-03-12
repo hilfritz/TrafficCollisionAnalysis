@@ -60,72 +60,20 @@ def collisions_by_hour(df: pd.DataFrame) -> pd.DataFrame:
 
     return result
 
-import pandas as pd
+def collisions_by_neighbourhood(df: pd.DataFrame, top_n: int = 10) -> pd.DataFrame:
+    """
+    Rank neighbourhoods by collision frequency.
+    """
+    _require_columns(df, ["NEIGHBOURHOOD_158"])
 
-from src.analytics import collisions_by_neighbourhood
-
-
-def test_collisions_by_neighbourhood_returns_grouped_counts():
-    df = pd.DataFrame(
-        {
-            "NEIGHBOURHOOD_158": ["A", "A", "B", "C", "C", "C"]
-        }
+    result = (
+        df.dropna(subset=["NEIGHBOURHOOD_158"])
+        .groupby("NEIGHBOURHOOD_158")
+        .size()
+        .reset_index(name="collision_count")
+        .sort_values("collision_count", ascending=False)
+        .head(top_n)
+        .reset_index(drop=True)
     )
 
-    result = collisions_by_neighbourhood(df)
-
-    assert list(result.columns) == ["NEIGHBOURHOOD_158", "collision_count"]
-    assert len(result) == 3
-
-
-def test_collisions_by_neighbourhood_sorts_by_collision_count_desc():
-    df = pd.DataFrame(
-        {
-            "NEIGHBOURHOOD_158": ["A", "A", "B", "C", "C", "C"]
-        }
-    )
-
-    result = collisions_by_neighbourhood(df)
-
-    assert result.iloc[0]["NEIGHBOURHOOD_158"] == "C"
-    assert int(result.iloc[0]["collision_count"]) == 3
-
-
-def test_collisions_by_neighbourhood_ignores_missing_values():
-    df = pd.DataFrame(
-        {
-            "NEIGHBOURHOOD_158": ["A", None, "B", "B", None, "C"]
-        }
-    )
-
-    result = collisions_by_neighbourhood(df)
-
-    assert result["NEIGHBOURHOOD_158"].isna().sum() == 0
-    assert int(result["collision_count"].sum()) == 4
-
-
-def test_collisions_by_neighbourhood_returns_top_n_only():
-    df = pd.DataFrame(
-        {
-            "NEIGHBOURHOOD_158": ["A", "A", "B", "C", "C", "C", "D"]
-        }
-    )
-
-    result = collisions_by_neighbourhood(df, top_n=2)
-
-    assert len(result) == 2
-    assert list(result["NEIGHBOURHOOD_158"]) == ["C", "A"]
-
-
-def test_collisions_by_neighbourhood_raises_error_if_column_missing():
-    df = pd.DataFrame(
-        {
-            "DIVISION": ["D11", "D12", "D14"]
-        }
-    )
-
-    try:
-        collisions_by_neighbourhood(df)
-        assert False, "Expected ValueError for missing NEIGHBOURHOOD_158 column"
-    except ValueError as e:
-        assert "Missing required columns" in str(e)
+    return result
