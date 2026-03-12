@@ -1,6 +1,6 @@
 ## Repository Statistics
 
-**Total Commits:** 33  
+**Total Commits:** 42  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -8,16 +8,16 @@
 
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
-| Hilfritz Camallere | `hilfritz` | 27 | 0 | 39 | 2641 | 173 | Active contributor |
+| Hilfritz Camallere | `hilfritz` | 32 | 8 | 43 | 2710 | 196 | Active contributor |
 | Ananya Mandal | `AnanyaMandal-DataAnalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 | Daniyal Khan | `daniyalnkh` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
-| Joseph Jamoralin | `Joseph-dataanalyst ` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
+| Joseph Jamoralin | `Joseph-dataanalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 
 ### Contributor Statistics
 
 | Contributor | Commits | Files Changed | Insertions | Deletions |
 |-------------|---------|---------------|------------|-----------|
-| Hilfritz Camallere | 27 | 39 | 2641 | 173 |
+| Hilfritz Camallere | 32 | 43 | 2710 | 196 |
 | Ananya Mandal | 0 | 0 | 0 | 0 |
 | Daniyal Khan | 0 | 0 | 0 | 0 |
 | Joseph Jamoralin | 0 | 0 | 0 | 0 |
@@ -26,10 +26,10 @@
 
 | Type | Count |
 |------|------:|
-| docs | 10 |
+| docs | 15 |
 | feat | 3 |
-| fix | 2 |
-| other | 12 |
+| fix | 4 |
+| other | 14 |
 | refactor | 4 |
 | test | 2 |
 
@@ -44,8 +44,21 @@
 
 ### Branch List
 
-- `main`
+- `fix/US-01-actions-test`
 
 ### Pull Request Statistics
 
-GitHub PR statistics are unavailable. Install and authenticate GitHub CLI with `gh auth login` to enable this section.
+**Total Pull Requests:** 8  
+**Merged Pull Requests:** 8  
+**Open Pull Requests:** 0
+
+| PR # | Title | State | Author |
+|------|-------|-------|--------|
+| 8 | US-01: Fix repository statistics workflow history depth | MERGED | hilfritz |
+| 7 | US-01: Fix team mapping in repository statistics generation | MERGED | hilfritz |
+| 6 | US-01: Add GitHub Actions workflow for automated repository statistics | MERGED | hilfritz |
+| 5 | US-01: Add GitHub Actions workflow for automated repository statistics | MERGED | hilfritz |
+| 4 | US-01: Add repository statistics automation for README documentation | MERGED | hilfritz |
+| 3 | US-05: Implement collision data cleaning | MERGED | hilfritz |
+| 2 | US-04: Load dataset | MERGED | hilfritz |
+| 1 | US-01: Project repository setup | MERGED | hilfritz |

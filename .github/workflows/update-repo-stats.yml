@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - fix/US-01-actions-test
   schedule:
     - cron: "0 3 * * *"
   workflow_dispatch:
@@ -14,10 +15,15 @@ concurrency:
 
 jobs:
   update-stats:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
+      pull-requests: read
+
+    env:
+      GH_TOKEN: ${{ github.token }}
 
     steps:
       - name: Checkout repository
@@ -43,13 +49,16 @@ jobs:
           python scripts/update_readme_stats.py
 
       - name: Commit updated stats
-        if: github.actor != 'github-actions'
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add REPO_STATS.md README.md
 
-          git diff --cached --quiet || git commit -m "docs: update repository statistics"
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
 
+          git commit -m "docs: update repository statistics"
           git push
