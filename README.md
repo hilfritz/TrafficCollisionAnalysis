@@ -703,29 +703,32 @@ refactor(US-06): improve validation logic
 ## Repository Statistics
 
 **Total Commits:** 1  
-**Total Contributors:** 1  
+**Total Team Members:** 4  
 **Branches Created:** 1
 
 ### Team Contribution Summary
 
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
-| Hilfritz Camallere | `hilfritz` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
+| Hilfritz Camallere | `hilfritz` | 1 | 0 | 20 | 2428 | 0 | Active contributor |
 | Ananya Mandal | `AnanyaMandal-DataAnalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 | Daniyal Khan | `daniyalnkh` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
-| Joseph Jamoralin | `Joseph-dataanalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
+| Joseph Jamoralin | `Joseph-dataanalyst ` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 
 ### Contributor Statistics
 
 | Contributor | Commits | Files Changed | Insertions | Deletions |
 |-------------|---------|---------------|------------|-----------|
-| github-actions | 1 | 20 | 2349 | 0 |
+| Hilfritz Camallere | 1 | 20 | 2428 | 0 |
+| Ananya Mandal | 0 | 0 | 0 | 0 |
+| Daniyal Khan | 0 | 0 | 0 | 0 |
+| Joseph Jamoralin | 0 | 0 | 0 | 0 |
 
 ### Commit Type Distribution
 
 | Type | Count |
 |------|------:|
-| docs | 1 |
+| other | 1 |
 
 ### File Metrics
 
