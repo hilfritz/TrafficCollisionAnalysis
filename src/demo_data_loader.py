@@ -1,6 +1,6 @@
 # src/demo_data_loader.py
 from .data_loader import load_dataset
-
+# python -m src.demo_data_loader
 def main():
     df = load_dataset("data/traffic_collisions.csv")
     print("Dataset loaded successfully.")
