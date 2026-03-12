@@ -31,7 +31,7 @@ TEAM_MEMBERS = [
     },
     {
         "name": "Joseph Jamoralin",
-        "github": "",
+        "github": "Joseph-dataanalyst",
         "git_names": ["Joseph Jamoralin"],
     },
 ]
