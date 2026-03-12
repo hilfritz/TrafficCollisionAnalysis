@@ -1,5 +1,9 @@
 # Byte-compiled / optimized / DLL files
 data/traffic_collisions.csv
+outputs/
+.venv/
+__pycache__/
+*.pyc
 __pycache__/
 *.py[codz]
 *$py.class
