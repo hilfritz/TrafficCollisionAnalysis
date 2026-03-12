@@ -694,6 +694,15 @@ refactor(US-06): improve validation logic
 
 ---
 
+
+## Repository Metrics
+<!-- METRICS:START -->
+<!-- METRICS:END -->
+
+<!-- REPO-STATS:START -->
+<!-- REPO-STATS:END -->
+---
+
 ## Project Team
 
 This project was collaboratively developed during a two-week Agile sprint at the University of Niagara Falls (Master of Data Analytics — Winter 2026).
@@ -709,3 +718,5 @@ This project was collaboratively developed during a two-week Agile sprint at the
   GitHub: https://github.com/daniyalnkh  
 
 - **Joseph Jamoralin**  
+  GitHub: https://github.com/Joseph-dataanalyst 
+
