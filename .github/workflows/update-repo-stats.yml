@@ -1,0 +1,48 @@
+name: Update Repository Statistics
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt || true
+
+      - name: Generate repository stats
+        run: |
+          python scripts/generate_repo_stats.py
+
+      - name: Update README
+        run: |
+          python scripts/update_readme_stats.py
+
+      - name: Commit updated stats
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          git add REPO_STATS.md README.md
+
+          git diff --cached --quiet || git commit -m "docs: update repository statistics"
+
+          git push
