@@ -1,3 +1,4 @@
+# scripts/generate_repo_stats.py
 from __future__ import annotations
 
 import json
@@ -9,6 +10,9 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 OUTPUT_MD = PROJECT_ROOT / "REPO_STATS.md"
 
+# Official team roster
+# git_names must match the actual output of:
+# git log --format="%an" | sort | uniq -c
 TEAM_MEMBERS = [
     {
         "name": "Hilfritz Camallere",
@@ -27,7 +31,7 @@ TEAM_MEMBERS = [
     },
     {
         "name": "Joseph Jamoralin",
-        "github": "Joseph-dataanalyst",
+        "github": "Joseph-dataanalyst ",
         "git_names": ["Joseph Jamoralin"],
     },
 ]
@@ -63,14 +67,16 @@ def get_branches() -> list[str]:
 
 def get_contributor_stats() -> list[dict]:
     """
-    Returns:
+    Returns contributor statistics directly from git history.
+
+    Example result:
         [
             {
-                "name": "...",
-                "commits": 0,
-                "insertions": 0,
-                "deletions": 0,
-                "files_changed": 0,
+                "name": "Hilfritz",
+                "commits": 16,
+                "insertions": 100,
+                "deletions": 10,
+                "files_changed": 25,
             }
         ]
     """
@@ -164,6 +170,7 @@ def get_pr_stats_from_gh() -> dict:
     """
     Requires GitHub CLI:
         gh auth login
+
     Returns empty stats if gh is unavailable or repo is not connected.
     """
     gh_version = safe_run_command(["gh", "--version"])
@@ -235,69 +242,115 @@ def get_pr_counts_by_author(prs: list[dict]) -> dict[str, int]:
 
     return dict(counts)
 
+
+def build_git_name_to_member_map() -> dict[str, str]:
+    """
+    Build a lookup:
+        Git author name -> official team member name
+    """
+    mapping = {}
+
+    for member in TEAM_MEMBERS:
+        official_name = member["name"]
+        for git_name in member.get("git_names", []):
+            mapping[git_name] = official_name
+
+    return mapping
+
+
 def build_team_contribution_summary(
     contributors: list[dict],
     pr_stats: dict,
 ) -> list[dict]:
     """
-    Combine the fixed team roster with actual Git contributor statistics
-    and PR statistics.
+    Combine contributor statistics and PR statistics into a full team roster summary.
 
-    This uses alias matching:
-    - team member official name
-    - possible Git author names in commit history
-
-    So even if Git commits use a shorter name, the stats still map correctly.
+    - All official team members are included
+    - Team members with no contributions still appear with 0 values
+    - Non-team contributors such as github-actions are excluded
     """
-    # Build lookup from contributor statistics:
-    # contributor name -> stats row
-    contributor_lookup = {c["name"]: c for c in contributors}
-
-    # Build PR counts by GitHub username
+    git_name_to_member = build_git_name_to_member_map()
     pr_counts = get_pr_counts_by_author(pr_stats["prs"]) if pr_stats["available"] else {}
 
-    summary = []
+    # Initialize every team member with zero values
+    summary_lookup = {
+        member["name"]: {
+            "name": member["name"],
+            "github": member["github"],
+            "commits": 0,
+            "files_changed": 0,
+            "insertions": 0,
+            "deletions": 0,
+            "prs": pr_counts.get(member["github"], 0) if member["github"] else 0,
+            "status": "No contributions yet",
+        }
+        for member in TEAM_MEMBERS
+    }
 
-    for member in TEAM_MEMBERS:
-        github = member["github"]
-        git_names = member.get("git_names", [])
+    # Merge real git contributor stats into the matching team member
+    for contributor in contributors:
+        raw_name = contributor["name"]
 
-        # Default zero stats
-        commits = 0
-        files_changed = 0
-        insertions = 0
-        deletions = 0
+        # Ignore non-team contributors like github-actions
+        if raw_name not in git_name_to_member:
+            continue
 
-        # Combine stats across all matching Git author aliases
-        for alias in git_names:
-            contributor_data = contributor_lookup.get(alias)
-            if contributor_data:
-                commits += contributor_data["commits"]
-                files_changed += contributor_data["files_changed"]
-                insertions += contributor_data["insertions"]
-                deletions += contributor_data["deletions"]
+        official_name = git_name_to_member[raw_name]
+        row = summary_lookup[official_name]
 
-        pr_count = pr_counts.get(github, 0) if github else 0
+        row["commits"] += contributor["commits"]
+        row["files_changed"] += contributor["files_changed"]
+        row["insertions"] += contributor["insertions"]
+        row["deletions"] += contributor["deletions"]
 
-        if commits == 0 and pr_count == 0:
-            status = "No contributions yet"
-        else:
-            status = "Active contributor"
+    # Update contribution status
+    for row in summary_lookup.values():
+        if row["commits"] > 0 or row["prs"] > 0:
+            row["status"] = "Active contributor"
 
-        summary.append(
-            {
-                "name": member["name"],
-                "github": github,
-                "commits": commits,
-                "files_changed": files_changed,
-                "insertions": insertions,
-                "deletions": deletions,
-                "prs": pr_count,
-                "status": status,
-            }
-        )
+    return list(summary_lookup.values())
 
-    return summary
+
+def build_filtered_contributor_statistics(
+    contributors: list[dict],
+) -> list[dict]:
+    """
+    Return contributor statistics restricted to official team members only.
+
+    - Removes bot/system contributors such as github-actions
+    - Merges multiple git aliases into the official team member name
+    """
+    git_name_to_member = build_git_name_to_member_map()
+
+    merged = {
+        member["name"]: {
+            "name": member["name"],
+            "commits": 0,
+            "files_changed": 0,
+            "insertions": 0,
+            "deletions": 0,
+        }
+        for member in TEAM_MEMBERS
+    }
+
+    for contributor in contributors:
+        raw_name = contributor["name"]
+
+        # Skip anything not mapped to a team member
+        if raw_name not in git_name_to_member:
+            continue
+
+        official_name = git_name_to_member[raw_name]
+        row = merged[official_name]
+
+        row["commits"] += contributor["commits"]
+        row["files_changed"] += contributor["files_changed"]
+        row["insertions"] += contributor["insertions"]
+        row["deletions"] += contributor["deletions"]
+
+    return sorted(merged.values(), key=lambda x: x["commits"], reverse=True)
+
+
 def build_markdown() -> str:
     total_commits = get_total_commits()
     branches = get_branches()
@@ -305,14 +358,16 @@ def build_markdown() -> str:
     commit_types = get_commit_type_distribution()
     file_counts = get_file_counts()
     pr_stats = get_pr_stats_from_gh()
+
     team_summary = build_team_contribution_summary(contributors, pr_stats)
+    filtered_contributors = build_filtered_contributor_statistics(contributors)
 
     lines = []
 
     lines.append("## Repository Statistics")
     lines.append("")
     lines.append(f"**Total Commits:** {total_commits}  ")
-    lines.append(f"**Total Contributors:** {len(contributors)}  ")
+    lines.append(f"**Total Team Members:** {len(TEAM_MEMBERS)}  ")
     lines.append(f"**Branches Created:** {len(branches)}")
     lines.append("")
 
@@ -331,7 +386,7 @@ def build_markdown() -> str:
     lines.append("")
     lines.append("| Contributor | Commits | Files Changed | Insertions | Deletions |")
     lines.append("|-------------|---------|---------------|------------|-----------|")
-    for c in contributors:
+    for c in filtered_contributors:
         lines.append(
             f"| {c['name']} | {c['commits']} | {c['files_changed']} | {c['insertions']} | {c['deletions']} |"
         )
