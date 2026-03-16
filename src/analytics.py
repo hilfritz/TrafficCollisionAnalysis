@@ -2,14 +2,54 @@ import pandas as pd
 
 
 def _require_columns(df: pd.DataFrame, required_columns: list[str]) -> None:
+    """
+    Validate that required columns exist before analysis.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Input dataset.
+    required_columns : list[str]
+        Columns required for the analysis.
+
+    Raises
+    ------
+    ValueError
+        If one or more required columns are missing.
+    """
     missing = [col for col in required_columns if col not in df.columns]
     if missing:
         raise ValueError(f"Missing required columns: {missing}")
 
 
 def collisions_by_hour(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Aggregate collisions by OCC_HOUR to identify peak collision periods.
+
+    This function supports time-based analysis by summarizing how many
+    collisions occurred in each hour of the day.
+
+    Cleaning assumptions:
+    - rows with missing OCC_HOUR are excluded
+    - results are sorted by highest collision count first
+    - ties are sorted by OCC_HOUR ascending
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Cleaned collision dataset.
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame with:
+        - OCC_HOUR
+        - collision_count
+    """
     _require_columns(df, ["OCC_HOUR"])
-    return (
+
+    # Remove rows where OCC_HOUR is missing before grouping
+    result = (
         df.dropna(subset=["OCC_HOUR"])
         .groupby("OCC_HOUR")
         .size()
@@ -18,10 +58,38 @@ def collisions_by_hour(df: pd.DataFrame) -> pd.DataFrame:
         .reset_index(drop=True)
     )
 
+    return result
 
 def collisions_by_neighbourhood(df: pd.DataFrame, top_n: int = 10) -> pd.DataFrame:
+    """
+    Rank neighbourhoods by collision frequency.
+
+    This function supports location-based safety analysis by identifying
+    which neighbourhoods have the highest number of recorded collisions.
+
+    Cleaning assumptions:
+    - rows with missing NEIGHBOURHOOD_158 are excluded
+    - results are sorted by highest collision count first
+    - output can be limited to the top_n neighbourhoods
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Cleaned collision dataset.
+    top_n : int, default=10
+        Number of top neighbourhoods to return.
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame with:
+        - NEIGHBOURHOOD_158
+        - collision_count
+    """
     _require_columns(df, ["NEIGHBOURHOOD_158"])
-    return (
+
+    # Remove rows where neighbourhood is missing before grouping
+    result = (
         df.dropna(subset=["NEIGHBOURHOOD_158"])
         .groupby("NEIGHBOURHOOD_158")
         .size()
@@ -31,6 +99,7 @@ def collisions_by_neighbourhood(df: pd.DataFrame, top_n: int = 10) -> pd.DataFra
         .reset_index(drop=True)
     )
 
+<<<<<<< HEAD
 
 def collision_severity_analysis(df: pd.DataFrame) -> pd.DataFrame:
     _require_columns(df, ["FATALITIES", "INJURY_COLLISIONS", "PD_COLLISIONS"])
@@ -151,3 +220,6 @@ def filter_collisions(df: pd.DataFrame, hour=None, year=None):
         filtered_df = filtered_df[filtered_df["YEAR"] == year]
 
     return filtered_df
+=======
+    return result
+>>>>>>> 69cd3d103d0706592b79bcb7f1163a4bbaad8a25

@@ -702,7 +702,7 @@ refactor(US-06): improve validation logic
 <!-- REPO-STATS:START -->
 ## Repository Statistics
 
-**Total Commits:** 44  
+**Total Commits:** 63  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -710,8 +710,8 @@ refactor(US-06): improve validation logic
 
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
-| Hilfritz Camallere | `hilfritz` | 33 | 9 | 43 | 2710 | 196 | Active contributor |
-| Ananya Mandal | `AnanyaMandal-DataAnalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
+| Hilfritz Camallere | `hilfritz` | 44 | 11 | 53 | 3029 | 264 | Active contributor |
+| Ananya Mandal | `AnanyaMandal-DataAnalyst` | 1 | 1 | 3 | 93 | 0 | Active contributor |
 | Daniyal Khan | `daniyalnkh` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 | Joseph Jamoralin | `Joseph-dataanalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 
@@ -719,8 +719,8 @@ refactor(US-06): improve validation logic
 
 | Contributor | Commits | Files Changed | Insertions | Deletions |
 |-------------|---------|---------------|------------|-----------|
-| Hilfritz Camallere | 33 | 43 | 2710 | 196 |
-| Ananya Mandal | 0 | 0 | 0 | 0 |
+| Hilfritz Camallere | 44 | 53 | 3029 | 264 |
+| Ananya Mandal | 1 | 3 | 93 | 0 |
 | Daniyal Khan | 0 | 0 | 0 | 0 |
 | Joseph Jamoralin | 0 | 0 | 0 | 0 |
 
@@ -728,20 +728,20 @@ refactor(US-06): improve validation logic
 
 | Type | Count |
 |------|------:|
-| docs | 16 |
-| feat | 3 |
+| docs | 25 |
+| feat | 5 |
 | fix | 4 |
-| other | 15 |
-| refactor | 4 |
-| test | 2 |
+| other | 19 |
+| refactor | 6 |
+| test | 4 |
 
 ### File Metrics
 
 | Metric | Value |
 |--------|------:|
-| Python Files | 12 |
-| Source Files | 6 |
-| Test Files | 4 |
+| Python Files | 20 |
+| Source Files | 9 |
+| Test Files | 6 |
 | Markdown Files | 2 |
 
 ### Branch List
@@ -750,12 +750,15 @@ refactor(US-06): improve validation logic
 
 ### Pull Request Statistics
 
-**Total Pull Requests:** 9  
-**Merged Pull Requests:** 9  
+**Total Pull Requests:** 12  
+**Merged Pull Requests:** 12  
 **Open Pull Requests:** 0
 
 | PR # | Title | State | Author |
 |------|-------|-------|--------|
+| 12 | US-07: Add collision analysis by neighbourhood | MERGED | hilfritz |
+| 11 | US-08-Generating charts to interpret patterns | MERGED | AnanyaMandal-DataAnalyst |
+| 10 | US-06: Add collision analysis by hour | MERGED | hilfritz |
 | 9 | US-01: Fix CI workflow for repository statistics generation | MERGED | hilfritz |
 | 8 | US-01: Fix repository statistics workflow history depth | MERGED | hilfritz |
 | 7 | US-01: Fix team mapping in repository statistics generation | MERGED | hilfritz |
