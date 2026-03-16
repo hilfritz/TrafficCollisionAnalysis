@@ -1,3 +1,4 @@
+# src/analytics.py
 import pandas as pd
 
 
@@ -25,30 +26,9 @@ def _require_columns(df: pd.DataFrame, required_columns: list[str]) -> None:
 def collisions_by_hour(df: pd.DataFrame) -> pd.DataFrame:
     """
     Aggregate collisions by OCC_HOUR to identify peak collision periods.
-
-    This function supports time-based analysis by summarizing how many
-    collisions occurred in each hour of the day.
-
-    Cleaning assumptions:
-    - rows with missing OCC_HOUR are excluded
-    - results are sorted by highest collision count first
-    - ties are sorted by OCC_HOUR ascending
-
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        Cleaned collision dataset.
-
-    Returns
-    -------
-    pandas.DataFrame
-        DataFrame with:
-        - OCC_HOUR
-        - collision_count
     """
     _require_columns(df, ["OCC_HOUR"])
 
-    # Remove rows where OCC_HOUR is missing before grouping
     result = (
         df.dropna(subset=["OCC_HOUR"])
         .groupby("OCC_HOUR")
@@ -60,35 +40,13 @@ def collisions_by_hour(df: pd.DataFrame) -> pd.DataFrame:
 
     return result
 
+
 def collisions_by_neighbourhood(df: pd.DataFrame, top_n: int = 10) -> pd.DataFrame:
     """
     Rank neighbourhoods by collision frequency.
-
-    This function supports location-based safety analysis by identifying
-    which neighbourhoods have the highest number of recorded collisions.
-
-    Cleaning assumptions:
-    - rows with missing NEIGHBOURHOOD_158 are excluded
-    - results are sorted by highest collision count first
-    - output can be limited to the top_n neighbourhoods
-
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        Cleaned collision dataset.
-    top_n : int, default=10
-        Number of top neighbourhoods to return.
-
-    Returns
-    -------
-    pandas.DataFrame
-        DataFrame with:
-        - NEIGHBOURHOOD_158
-        - collision_count
     """
     _require_columns(df, ["NEIGHBOURHOOD_158"])
 
-    # Remove rows where neighbourhood is missing before grouping
     result = (
         df.dropna(subset=["NEIGHBOURHOOD_158"])
         .groupby("NEIGHBOURHOOD_158")
@@ -100,3 +58,84 @@ def collisions_by_neighbourhood(df: pd.DataFrame, top_n: int = 10) -> pd.DataFra
     )
 
     return result
+
+
+def collision_severity_analysis(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Summarize fatalities, injury collisions, and property damage collisions.
+    """
+    _require_columns(df, ["FATALITIES", "INJURY_COLLISIONS", "PD_COLLISIONS"])
+
+    fatalities = int(pd.to_numeric(df["FATALITIES"], errors="coerce").fillna(0).sum())
+    injury_collisions = int(df["INJURY_COLLISIONS"].fillna(False).astype(bool).sum())
+    property_damage_collisions = int(df["PD_COLLISIONS"].fillna(False).astype(bool).sum())
+
+    return pd.DataFrame(
+        {
+            "severity_type": [
+                "Fatalities",
+                "Injury Collisions",
+                "Property Damage Collisions",
+            ],
+            "value": [
+                fatalities,
+                injury_collisions,
+                property_damage_collisions,
+            ],
+        }
+    )
+
+
+def road_user_analysis(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Count collisions involving key road user categories.
+    """
+    _require_columns(df, ["PEDESTRIAN", "BICYCLE", "MOTORCYCLE", "AUTOMOBILE"])
+
+    return pd.DataFrame(
+        {
+            "road_user_type": [
+                "Pedestrian",
+                "Bicycle",
+                "Motorcycle",
+                "Automobile",
+            ],
+            "collision_count": [
+                int(df["PEDESTRIAN"].fillna(False).astype(bool).sum()),
+                int(df["BICYCLE"].fillna(False).astype(bool).sum()),
+                int(df["MOTORCYCLE"].fillna(False).astype(bool).sum()),
+                int(df["AUTOMOBILE"].fillna(False).astype(bool).sum()),
+            ],
+        }
+    )
+
+
+def filter_collisions(
+    df: pd.DataFrame,
+    years: list[int] | None = None,
+    divisions: list[str] | None = None,
+    neighbourhoods: list[str] | None = None,
+) -> pd.DataFrame:
+    """
+    Filter the cleaned collision dataset by selected fields.
+    """
+    result = df.copy()
+
+    if years:
+        result = result[result["OCC_YEAR"].isin(years)]
+
+    if divisions:
+        result = result[result["DIVISION"].isin(divisions)]
+
+    if neighbourhoods:
+        result = result[result["NEIGHBOURHOOD_158"].isin(neighbourhoods)]
+
+    return result.copy()
+
+
+def export_results(df: pd.DataFrame, output_path: str) -> str:
+    """
+    Export a DataFrame to CSV and return the saved file path.
+    """
+    df.to_csv(output_path, index=False)
+    return output_path
