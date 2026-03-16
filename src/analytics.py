@@ -112,3 +112,42 @@ def road_user_analysis(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return summary
+import pandas as pd
+
+
+def filter_collisions(df: pd.DataFrame, hour=None, year=None):
+    """
+    Filter collision dataset by hour or year.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Collision dataset
+    hour : int (optional)
+        Hour of day filter
+    year : int (optional)
+        Year filter
+
+    Returns
+    -------
+    pandas.DataFrame
+        Filtered dataset
+    """
+
+    filtered_df = df.copy()
+
+    # Filter by hour
+    if hour is not None:
+        if "OCC_HOUR" not in filtered_df.columns:
+            raise ValueError("Dataset must contain OCC_HOUR column")
+
+        filtered_df = filtered_df[filtered_df["OCC_HOUR"] == hour]
+
+    # Filter by year
+    if year is not None:
+        if "YEAR" not in filtered_df.columns:
+            raise ValueError("Dataset must contain YEAR column")
+
+        filtered_df = filtered_df[filtered_df["YEAR"] == year]
+
+    return filtered_df
