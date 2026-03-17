@@ -702,7 +702,7 @@ refactor(US-06): improve validation logic
 <!-- REPO-STATS:START -->
 ## Repository Statistics
 
-**Total Commits:** 64  
+**Total Commits:** 77  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -710,8 +710,8 @@ refactor(US-06): improve validation logic
 
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
-| Hilfritz Camallere | `hilfritz` | 44 | 11 | 53 | 3029 | 264 | Active contributor |
-| Ananya Mandal | `AnanyaMandal-DataAnalyst` | 1 | 2 | 3 | 93 | 0 | Active contributor |
+| Hilfritz Camallere | `hilfritz` | 46 | 11 | 55 | 3029 | 264 | Active contributor |
+| Ananya Mandal | `AnanyaMandal-DataAnalyst` | 11 | 2 | 14 | 376 | 112 | Active contributor |
 | Daniyal Khan | `daniyalnkh` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 | Joseph Jamoralin | `Joseph-dataanalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 
@@ -719,8 +719,8 @@ refactor(US-06): improve validation logic
 
 | Contributor | Commits | Files Changed | Insertions | Deletions |
 |-------------|---------|---------------|------------|-----------|
-| Hilfritz Camallere | 44 | 53 | 3029 | 264 |
-| Ananya Mandal | 1 | 3 | 93 | 0 |
+| Hilfritz Camallere | 46 | 55 | 3029 | 264 |
+| Ananya Mandal | 11 | 14 | 376 | 112 |
 | Daniyal Khan | 0 | 0 | 0 | 0 |
 | Joseph Jamoralin | 0 | 0 | 0 | 0 |
 
@@ -728,20 +728,20 @@ refactor(US-06): improve validation logic
 
 | Type | Count |
 |------|------:|
-| docs | 26 |
+| docs | 27 |
 | feat | 5 |
 | fix | 4 |
-| other | 19 |
-| refactor | 6 |
+| other | 30 |
+| refactor | 7 |
 | test | 4 |
 
 ### File Metrics
 
 | Metric | Value |
 |--------|------:|
-| Python Files | 18 |
-| Source Files | 9 |
-| Test Files | 6 |
+| Python Files | 22 |
+| Source Files | 11 |
+| Test Files | 9 |
 | Markdown Files | 2 |
 
 ### Branch List
@@ -751,12 +751,12 @@ refactor(US-06): improve validation logic
 ### Pull Request Statistics
 
 **Total Pull Requests:** 13  
-**Merged Pull Requests:** 12  
-**Open Pull Requests:** 1
+**Merged Pull Requests:** 13  
+**Open Pull Requests:** 0
 
 | PR # | Title | State | Author |
 |------|-------|-------|--------|
-| 13 | US - 11 road user analysis | OPEN | AnanyaMandal-DataAnalyst |
+| 13 | US - 11 road user analysis | MERGED | AnanyaMandal-DataAnalyst |
 | 12 | US-07: Add collision analysis by neighbourhood | MERGED | hilfritz |
 | 11 | US-08-Generating charts to interpret patterns | MERGED | AnanyaMandal-DataAnalyst |
 | 10 | US-06: Add collision analysis by hour | MERGED | hilfritz |
