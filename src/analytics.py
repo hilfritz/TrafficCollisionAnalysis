@@ -100,3 +100,29 @@ def collisions_by_neighbourhood(df: pd.DataFrame, top_n: int = 10) -> pd.DataFra
     )
 
     return result
+import os
+import pandas as pd
+def export_results(df: pd.DataFrame, output_path: str) -> str:
+    """
+    Export analysis results to a CSV file.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Analysis results
+    output_path : str
+        Path to output CSV file
+
+    Returns
+    -------
+    str
+        Path to created file
+    """
+
+    # Create folder if it doesn't exist
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    # Save CSV
+    df.to_csv(output_path, index=False)
+
+    return output_path
