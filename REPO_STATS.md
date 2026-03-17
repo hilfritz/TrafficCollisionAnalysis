@@ -1,6 +1,6 @@
 ## Repository Statistics
 
-**Total Commits:** 63  
+**Total Commits:** 64  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -9,7 +9,7 @@
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
 | Hilfritz Camallere | `hilfritz` | 44 | 11 | 53 | 3029 | 264 | Active contributor |
-| Ananya Mandal | `AnanyaMandal-DataAnalyst` | 1 | 1 | 3 | 93 | 0 | Active contributor |
+| Ananya Mandal | `AnanyaMandal-DataAnalyst` | 1 | 2 | 3 | 93 | 0 | Active contributor |
 | Daniyal Khan | `daniyalnkh` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 | Joseph Jamoralin | `Joseph-dataanalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
 
@@ -26,7 +26,7 @@
 
 | Type | Count |
 |------|------:|
-| docs | 25 |
+| docs | 26 |
 | feat | 5 |
 | fix | 4 |
 | other | 19 |
@@ -37,7 +37,7 @@
 
 | Metric | Value |
 |--------|------:|
-| Python Files | 20 |
+| Python Files | 18 |
 | Source Files | 9 |
 | Test Files | 6 |
 | Markdown Files | 2 |
@@ -48,12 +48,13 @@
 
 ### Pull Request Statistics
 
-**Total Pull Requests:** 12  
+**Total Pull Requests:** 13  
 **Merged Pull Requests:** 12  
-**Open Pull Requests:** 0
+**Open Pull Requests:** 1
 
 | PR # | Title | State | Author |
 |------|-------|-------|--------|
+| 13 | US - 11 road user analysis | OPEN | AnanyaMandal-DataAnalyst |
 | 12 | US-07: Add collision analysis by neighbourhood | MERGED | hilfritz |
 | 11 | US-08-Generating charts to interpret patterns | MERGED | AnanyaMandal-DataAnalyst |
 | 10 | US-06: Add collision analysis by hour | MERGED | hilfritz |
