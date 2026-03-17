@@ -100,3 +100,16 @@ def collisions_by_neighbourhood(df: pd.DataFrame, top_n: int = 10) -> pd.DataFra
     )
 
     return result
+
+
+def collision_severity_analysis(df: pd.DataFrame) -> pd.DataFrame:
+    _require_columns(df, ["FATALITIES", "INJURY_COLLISIONS", "PD_COLLISIONS"])
+    fatalities = int(pd.to_numeric(df["FATALITIES"], errors="coerce").fillna(0).sum())
+    injury_collisions = int(df["INJURY_COLLISIONS"].fillna(False).astype(bool).sum())
+    property_damage_collisions = int(df["PD_COLLISIONS"].fillna(False).astype(bool).sum())
+    return pd.DataFrame(
+        {
+            "severity_type": ["Fatalities", "Injury Collisions", "Property Damage Collisions"],
+            "value": [fatalities, injury_collisions, property_damage_collisions],
+        }
+    )
