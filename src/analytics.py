@@ -1,6 +1,6 @@
 # src/analytics.py
 import pandas as pd
-
+import os
 
 def _require_columns(df: pd.DataFrame, required_columns: list[str]) -> None:
     """
@@ -192,5 +192,10 @@ def export_results(df: pd.DataFrame, output_path: str) -> str:
         Path to created file
     """
 
+    # Create folder if it doesn't exist
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    # Save CSV
     df.to_csv(output_path, index=False)
+
     return output_path

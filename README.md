@@ -741,7 +741,7 @@ refactor(US-06): improve validation logic
 <!-- REPO-STATS:START -->
 ## Repository Statistics
 
-**Total Commits:** 58  
+**Total Commits:** 83  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -749,38 +749,38 @@ refactor(US-06): improve validation logic
 
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
-| Hilfritz Camallere | `hilfritz` | 43 | 11 | 53 | 3029 | 264 | Active contributor |
-| Ananya Mandal | `AnanyaMandal-DataAnalyst` | 0 | 1 | 0 | 0 | 0 | Active contributor |
+| Hilfritz Camallere | `hilfritz` | 47 | 11 | 55 | 3029 | 264 | Active contributor |
+| Ananya Mandal | `AnanyaMandal-DataAnalyst` | 12 | 2 | 14 | 376 | 112 | Active contributor |
 | Daniyal Khan | `daniyalnkh` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
-| Joseph Jamoralin | `Joseph-dataanalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
+| Joseph Jamoralin | `Joseph-dataanalyst` | 2 | 1 | 5 | 104 | 5 | Active contributor |
 
 ### Contributor Statistics
 
 | Contributor | Commits | Files Changed | Insertions | Deletions |
 |-------------|---------|---------------|------------|-----------|
-| Hilfritz Camallere | 43 | 53 | 3029 | 264 |
-| Ananya Mandal | 0 | 0 | 0 | 0 |
+| Hilfritz Camallere | 47 | 55 | 3029 | 264 |
+| Ananya Mandal | 12 | 14 | 376 | 112 |
+| Joseph Jamoralin | 2 | 5 | 104 | 5 |
 | Daniyal Khan | 0 | 0 | 0 | 0 |
-| Joseph Jamoralin | 0 | 0 | 0 | 0 |
 
 ### Commit Type Distribution
 
 | Type | Count |
 |------|------:|
-| docs | 22 |
+| docs | 29 |
 | feat | 5 |
 | fix | 4 |
-| other | 17 |
-| refactor | 6 |
+| other | 34 |
+| refactor | 7 |
 | test | 4 |
 
 ### File Metrics
 
 | Metric | Value |
 |--------|------:|
-| Python Files | 17 |
-| Source Files | 8 |
-| Test Files | 5 |
+| Python Files | 22 |
+| Source Files | 11 |
+| Test Files | 9 |
 | Markdown Files | 2 |
 
 ### Branch List
@@ -789,14 +789,16 @@ refactor(US-06): improve validation logic
 
 ### Pull Request Statistics
 
-**Total Pull Requests:** 12  
-**Merged Pull Requests:** 11  
-**Open Pull Requests:** 1
+**Total Pull Requests:** 14  
+**Merged Pull Requests:** 14  
+**Open Pull Requests:** 0
 
 | PR # | Title | State | Author |
 |------|-------|-------|--------|
+| 14 | Add codes for feature/US-10 | MERGED | Joseph-dataanalyst |
+| 13 | US - 11 road user analysis | MERGED | AnanyaMandal-DataAnalyst |
 | 12 | US-07: Add collision analysis by neighbourhood | MERGED | hilfritz |
-| 11 | US-08-Generating charts to interpret patterns | OPEN | AnanyaMandal-DataAnalyst |
+| 11 | US-08-Generating charts to interpret patterns | MERGED | AnanyaMandal-DataAnalyst |
 | 10 | US-06: Add collision analysis by hour | MERGED | hilfritz |
 | 9 | US-01: Fix CI workflow for repository statistics generation | MERGED | hilfritz |
 | 8 | US-01: Fix repository statistics workflow history depth | MERGED | hilfritz |
