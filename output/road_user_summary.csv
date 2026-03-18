@@ -1,0 +1,4 @@
+road_user_type,collision_count
+Pedestrian,120
+Cyclist,85
+Automobile,300

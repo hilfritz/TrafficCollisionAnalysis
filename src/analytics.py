@@ -1,5 +1,5 @@
 import pandas as pd
-
+import os
 
 def _require_columns(df: pd.DataFrame, required_columns: list[str]) -> None:
     """
@@ -113,3 +113,29 @@ def collision_severity_analysis(df: pd.DataFrame) -> pd.DataFrame:
             "value": [fatalities, injury_collisions, property_damage_collisions],
         }
     )
+
+
+def export_results(df: pd.DataFrame, output_path: str) -> str:
+    """
+    Export analysis results to a CSV file.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Analysis results
+    output_path : str
+        Path to output CSV file
+
+    Returns
+    -------
+    str
+        Path to created file
+    """
+
+    # Create folder if it doesn't exist
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    # Save CSV
+    df.to_csv(output_path, index=False)
+
+    return output_path
