@@ -1,6 +1,6 @@
 ## Repository Statistics
 
-**Total Commits:** 77  
+**Total Commits:** 78  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -11,7 +11,7 @@
 | Hilfritz Camallere | `hilfritz` | 46 | 11 | 55 | 3029 | 264 | Active contributor |
 | Ananya Mandal | `AnanyaMandal-DataAnalyst` | 11 | 2 | 14 | 376 | 112 | Active contributor |
 | Daniyal Khan | `daniyalnkh` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
-| Joseph Jamoralin | `Joseph-dataanalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
+| Joseph Jamoralin | `Joseph-dataanalyst` | 0 | 1 | 0 | 0 | 0 | Active contributor |
 
 ### Contributor Statistics
 
@@ -26,7 +26,7 @@
 
 | Type | Count |
 |------|------:|
-| docs | 27 |
+| docs | 28 |
 | feat | 5 |
 | fix | 4 |
 | other | 30 |
@@ -48,12 +48,13 @@
 
 ### Pull Request Statistics
 
-**Total Pull Requests:** 13  
+**Total Pull Requests:** 14  
 **Merged Pull Requests:** 13  
-**Open Pull Requests:** 0
+**Open Pull Requests:** 1
 
 | PR # | Title | State | Author |
 |------|-------|-------|--------|
+| 14 | Add codes for feature/US-10 | OPEN | Joseph-dataanalyst |
 | 13 | US - 11 road user analysis | MERGED | AnanyaMandal-DataAnalyst |
 | 12 | US-07: Add collision analysis by neighbourhood | MERGED | hilfritz |
 | 11 | US-08-Generating charts to interpret patterns | MERGED | AnanyaMandal-DataAnalyst |
