@@ -26,6 +26,26 @@ def _require_columns(df: pd.DataFrame, required_columns: list[str]) -> None:
 def collisions_by_hour(df: pd.DataFrame) -> pd.DataFrame:
     """
     Aggregate collisions by OCC_HOUR to identify peak collision periods.
+
+    This function supports time-based analysis by summarizing how many
+    collisions occurred in each hour of the day.
+
+    Cleaning assumptions:
+    - rows with missing OCC_HOUR are excluded
+    - results are sorted by highest collision count first
+    - ties are sorted by OCC_HOUR ascending
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Cleaned collision dataset.
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame with:
+        - OCC_HOUR
+        - collision_count
     """
     _require_columns(df, ["OCC_HOUR"])
 
@@ -44,6 +64,28 @@ def collisions_by_hour(df: pd.DataFrame) -> pd.DataFrame:
 def collisions_by_neighbourhood(df: pd.DataFrame, top_n: int = 10) -> pd.DataFrame:
     """
     Rank neighbourhoods by collision frequency.
+
+    This function supports location-based safety analysis by identifying
+    which neighbourhoods have the highest number of recorded collisions.
+
+    Cleaning assumptions:
+    - rows with missing NEIGHBOURHOOD_158 are excluded
+    - results are sorted by highest collision count first
+    - output can be limited to the top_n neighbourhoods
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Cleaned collision dataset.
+    top_n : int, default=10
+        Number of top neighbourhoods to return.
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame with:
+        - NEIGHBOURHOOD_158
+        - collision_count
     """
     _require_columns(df, ["NEIGHBOURHOOD_158"])
 
@@ -135,7 +177,20 @@ def filter_collisions(
 
 def export_results(df: pd.DataFrame, output_path: str) -> str:
     """
-    Export a DataFrame to CSV and return the saved file path.
+    Export analysis results to a CSV file.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Analysis results
+    output_path : str
+        Path to output CSV file
+
+    Returns
+    -------
+    str
+        Path to created file
     """
+
     df.to_csv(output_path, index=False)
     return output_path
