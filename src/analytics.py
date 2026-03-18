@@ -1,5 +1,5 @@
 import pandas as pd
-
+import os
 
 def _require_columns(df: pd.DataFrame, required_columns: list[str]) -> None:
     """
@@ -100,8 +100,21 @@ def collisions_by_neighbourhood(df: pd.DataFrame, top_n: int = 10) -> pd.DataFra
     )
 
     return result
-import os
-import pandas as pd
+
+
+def collision_severity_analysis(df: pd.DataFrame) -> pd.DataFrame:
+    _require_columns(df, ["FATALITIES", "INJURY_COLLISIONS", "PD_COLLISIONS"])
+    fatalities = int(pd.to_numeric(df["FATALITIES"], errors="coerce").fillna(0).sum())
+    injury_collisions = int(df["INJURY_COLLISIONS"].fillna(False).astype(bool).sum())
+    property_damage_collisions = int(df["PD_COLLISIONS"].fillna(False).astype(bool).sum())
+    return pd.DataFrame(
+        {
+            "severity_type": ["Fatalities", "Injury Collisions", "Property Damage Collisions"],
+            "value": [fatalities, injury_collisions, property_damage_collisions],
+        }
+    )
+
+
 def export_results(df: pd.DataFrame, output_path: str) -> str:
     """
     Export analysis results to a CSV file.

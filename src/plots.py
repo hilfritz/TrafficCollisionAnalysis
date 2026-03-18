@@ -28,6 +28,44 @@ def plot_collisions_by_hour(hourly_df: pd.DataFrame):
     return fig
 
 
+def plot_collision_severity(severity_df: pd.DataFrame, kind: str = "bar"):
+    """
+    Generate chart for collision severity analysis.
+
+    Parameters
+    ----------
+    severity_df : pandas.DataFrame
+        DataFrame with columns `severity_type` and `value` as returned by
+        `collision_severity_analysis`.
+    kind : str, optional
+        Chart type: "bar" (default) or "pie".
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+    """
+    if not {"severity_type", "value"}.issubset(severity_df.columns):
+        raise ValueError("severity_df must contain severity_type and value")
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+
+    if kind == "bar":
+        colors = ["#d9534f", "#f0ad4e", "#5bc0de"]
+        ax.bar(severity_df["severity_type"], severity_df["value"], color=colors[: len(severity_df)])
+        ax.set_title("Collision Severity Analysis")
+        ax.set_ylabel("Count")
+        ax.set_xlabel("Severity Type")
+    elif kind == "pie":
+        ax.pie(severity_df["value"], labels=severity_df["severity_type"], autopct="%1.1f%%", startangle=140)
+        ax.set_title("Collision Severity Distribution")
+    else:
+        raise ValueError('kind must be "bar" or "pie"')
+
+    plt.tight_layout()
+
+    return fig
+
+
 def plot_top_neighbourhoods(neighbourhood_df: pd.DataFrame):
     """
     Generate chart: collisions by neighbourhood
