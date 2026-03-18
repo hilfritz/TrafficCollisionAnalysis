@@ -1,5 +1,6 @@
 import pandas as pd
-from src.plots import plot_collisions_by_hour, plot_top_neighbourhoods
+import pytest
+from src.plots import plot_collisions_by_hour, plot_top_neighbourhoods, plot_collision_severity
 
 
 def test_plot_collisions_by_hour_returns_figure():
@@ -26,3 +27,30 @@ def test_plot_neighbourhood_returns_figure():
 
     assert fig is not None
     assert fig.__class__.__name__ == "Figure"
+
+
+def test_plot_collision_severity_bar_and_pie_return_figures():
+
+    data = pd.DataFrame({
+        "severity_type": ["Fatalities", "Injury Collisions", "Property Damage Collisions"],
+        "value": [1, 5, 20],
+    })
+
+    fig_bar = plot_collision_severity(data, kind="bar")
+    assert fig_bar is not None
+    assert fig_bar.__class__.__name__ == "Figure"
+
+    fig_pie = plot_collision_severity(data, kind="pie")
+    assert fig_pie is not None
+    assert fig_pie.__class__.__name__ == "Figure"
+
+
+def test_plot_collision_severity_invalid_inputs_raise():
+    data = pd.DataFrame({"severity_type": ["A"], "value": [1]})
+
+    with pytest.raises(ValueError):
+        plot_collision_severity(data.drop(columns=["value"]))
+
+    with pytest.raises(ValueError):
+        plot_collision_severity(data, kind="unsupported")
+    
