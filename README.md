@@ -741,7 +741,7 @@ refactor(US-06): improve validation logic
 <!-- REPO-STATS:START -->
 ## Repository Statistics
 
-**Total Commits:** 89  
+**Total Commits:** 94  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -749,28 +749,28 @@ refactor(US-06): improve validation logic
 
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
-| Hilfritz Camallere | `hilfritz` | 51 | 12 | 62 | 4415 | 337 | Active contributor |
-| Ananya Mandal | `AnanyaMandal-DataAnalyst` | 12 | 2 | 14 | 376 | 112 | Active contributor |
+| Hilfritz Camallere | `hilfritz` | 53 | 12 | 66 | 4497 | 339 | Active contributor |
+| Ananya Mandal | `AnanyaMandal-DataAnalyst` | 12 | 3 | 14 | 376 | 112 | Active contributor |
 | Daniyal Khan | `daniyalnkh` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
-| Joseph Jamoralin | `Joseph-dataanalyst` | 3 | 1 | 5 | 104 | 5 | Active contributor |
+| Joseph Jamoralin | `Joseph-dataanalyst` | 5 | 2 | 6 | 122 | 10 | Active contributor |
 
 ### Contributor Statistics
 
 | Contributor | Commits | Files Changed | Insertions | Deletions |
 |-------------|---------|---------------|------------|-----------|
-| Hilfritz Camallere | 51 | 62 | 4415 | 337 |
+| Hilfritz Camallere | 53 | 66 | 4497 | 339 |
 | Ananya Mandal | 12 | 14 | 376 | 112 |
-| Joseph Jamoralin | 3 | 5 | 104 | 5 |
+| Joseph Jamoralin | 5 | 6 | 122 | 10 |
 | Daniyal Khan | 0 | 0 | 0 | 0 |
 
 ### Commit Type Distribution
 
 | Type | Count |
 |------|------:|
-| docs | 31 |
+| docs | 32 |
 | feat | 6 |
-| fix | 5 |
-| other | 36 |
+| fix | 6 |
+| other | 39 |
 | refactor | 7 |
 | test | 4 |
 
@@ -789,12 +789,14 @@ refactor(US-06): improve validation logic
 
 ### Pull Request Statistics
 
-**Total Pull Requests:** 15  
-**Merged Pull Requests:** 15  
-**Open Pull Requests:** 0
+**Total Pull Requests:** 17  
+**Merged Pull Requests:** 16  
+**Open Pull Requests:** 1
 
 | PR # | Title | State | Author |
 |------|-------|-------|--------|
+| 17 | US-09: Automated Tests | MERGED | Joseph-dataanalyst |
+| 16 | road_user_analysis | OPEN | AnanyaMandal-DataAnalyst |
 | 15 | US-12: Interactive Collision Analytics Dashboard | MERGED | hilfritz |
 | 14 | US-10: Feature Collision Severity Analysis | MERGED | Joseph-dataanalyst |
 | 13 | US - 11 road user analysis | MERGED | AnanyaMandal-DataAnalyst |
