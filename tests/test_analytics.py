@@ -4,6 +4,8 @@ from src.analytics import collisions_by_hour
 
 from src.analytics import collisions_by_neighbourhood
 
+from src.analytics import collision_severity_analysis
+
 def test_collisions_by_hour_returns_hourly_counts():
     df = pd.DataFrame(
         {
@@ -124,3 +126,17 @@ def test_collisions_by_neighbourhood_raises_error_if_column_missing():
         assert False, "Expected ValueError for missing NEIGHBOURHOOD_158 column"
     except ValueError as e:
         assert "Missing required columns" in str(e)
+
+   
+
+
+def test_collision_severity_analysis_returns_expected_rows():
+    df = pd.DataFrame(
+        {
+            "FATALITIES": [1, 0],
+            "INJURY_COLLISIONS": [True, False],
+            "PD_COLLISIONS": [False, True],
+        }
+    )
+    result = collision_severity_analysis(df)
+    assert len(result) == 3

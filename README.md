@@ -16,7 +16,7 @@
 - [Data Analytics Pipeline](#data-analytics-pipeline)
 - [Project Structure](#project-structure)
 - [Installation & Setup](#installation--setup)
-- [Running the Tool](#running-the-tool)
+- [How to Run](#️-how-to-run)
 - [Results](#results)
 - [Dataset Schema Summary](#dataset-schema-summary)
 - [TDD Workflow](#tdd-workflow)
@@ -24,7 +24,6 @@
 - [Traceability Matrix](#traceability-matrix)
 - [Git Workflow & Naming Conventions](#git-workflow--naming-conventions)
 - [Project Team](#project-team)
-
 ---
 
 ## Project Overview
@@ -211,29 +210,69 @@ pip install -r requirements.txt
 
 ---
 
-## Running the Tool
+## ▶️ How to Run
+
+### 1. Prepare the Dataset (Required)
+
+Run the data preparation script to clean and optimize the dataset.
+
+```
+PYTHONPATH=. python src/prepare_dataset.py
+```
+
+This step:
+- Cleans and standardizes raw data
+- Generates derived fields (e.g., severity, flags)
+- Optimizes dataset for faster dashboard performance
+
+Output:
+data/processed/traffic_collisions_prepared.parquet
+
+---
+
+### 2. Run the CLI Tool (Optional)
 
 ```
 python -m src.cli_demo
 ```
 
-The program:
+The CLI tool:
+- Loads the dataset
+- Cleans invalid records
+- Computes summaries
+- Produces charts
 
-• loads the dataset  
-• cleans invalid records  
-• computes summaries  
-• produces charts  
+---
 
+### 3. Run the Dashboard (Main Application)
 
-## Running Streamlit
 ```
-streamlit run src/app.py
+PYTHONPATH=. streamlit run src/app.py
 ```
 
-## Running Tests
+---
+
+### 4. Open in Browser
+
+http://localhost:8501
+
+---
+
+### 5. Run Tests
+
 ```
 pytest
 ```
+
+---
+
+## Notes
+
+- Dataset preparation must be completed before running the dashboard
+- The dashboard uses the processed dataset for performance optimization
+- Default dashboard filters:
+  - Latest year
+  - Last 90 days
 ---
 
 ## Results
@@ -546,21 +585,21 @@ Each story followed the **Red → Green → Refactor** workflow.
 
 | User Story | Branch | Tag | Commit Summary | PR Title | Status |
 |-------------|--------|------|----------------|----------|--------|
-| US-01 | chore/US-01-repo-setup | v0.1-setup | chore(US-01): initialize repository structure | US-01: Project repository setup | Merged |
-| US-02 | docs/US-02-user-story-identification | v0.2-backlog | docs(US-02): add user stories to README | US-02: User story identification | Merged |
-| US-03 | chore/US-03-sprint-planning | v0.3-sprint-plan | chore(US-03): define sprint scope | US-03: Sprint planning | Merged |
-| US-04 | feature/US-04-data-loader | v0.4-loader | feat(US-04): implement dataset loader | US-04: Load dataset | Merged |
-| US-05 | feature/US-05-data-cleaning | v0.5-cleaning | feat(US-05): implement data cleaning utilities | US-05: Clean collision data | Merged |
-| US-06 | feature/US-06-collisions-by-hour | v0.6-hourly | feat(US-06): implement hourly collision aggregation | US-06: Collision analysis by hour | Merged |
-| US-07 | feature/US-07-collisions-by-neighbourhood | v0.7-neighbourhood | feat(US-07): implement neighbourhood collision analysis | US-07: Collision analysis by neighbourhood | Merged |
-| US-08 | feature/US-08-charts | v0.8-charts | feat(US-08): generate collision analysis charts | US-08: Chart generation | Merged |
-| US-09 | test/US-09-automated-tests | v0.9-tests | test(US-09): add automated tests | US-09: Automated tests | Merged |
-| US-10 | feature/US-10-severity-analysis | v1.0-severity | feat(US-10): implement collision severity analysis | US-10: Collision severity analysis | Merged |
-| US-11 | feature/US-11-road-user-analysis | v1.1-road-users | feat(US-11): analyze road user involvement | US-11: Road user analysis | Merged |
-| US-12 | feature/US-12-dashboard | v1.2-dashboard | feat(US-12): implement interactive dashboard | US-12: Interactive analytics dashboard | Merged |
-| US-13 | feature/US-13-export-results | v1.3-export | feat(US-13): implement export functionality | US-13: Export analytics results | Merged |
-| US-14 | feature/US-14-filtering | v1.4-filtering | feat(US-14): implement filtering functionality | US-14: Dataset filtering feature | Merged |
-| US-15 | refactor/US-15-code-refactor | v1.5-refactor | refactor(US-15): improve code structure | US-15: Refactor codebase | Merged |
+| US-01 | chore/US-01-repo-setup | US-01-COMPLETE | chore(US-01): initialize repository structure | US-01: Project repository setup | Merged |
+| US-02 | docs/US-02-user-story-identification | US-02-COMPLETE | docs(US-02): add user stories to README | US-02: User story identification | Merged |
+| US-03 | chore/US-03-sprint-planning | US-03-COMPLETE | chore(US-03): define sprint scope | US-03: Sprint planning | Merged |
+| US-04 | feature/US-04-data-loader | US-04-COMPLETE | feat(US-04): implement dataset loader | US-04: Load dataset | Merged |
+| US-05 | feature/US-05-data-cleaning | US-05-COMPLETE | feat(US-05): implement data cleaning utilities | US-05: Clean collision data | Merged |
+| US-06 | feature/US-06-collisions-by-hour | US-06-COMPLETE | feat(US-06): implement hourly collision aggregation | US-06: Collision analysis by hour | Merged |
+| US-07 | feature/US-07-collisions-by-neighbourhood | US-07-COMPLETE | feat(US-07): implement neighbourhood collision analysis | US-07: Collision analysis by neighbourhood | Merged |
+| US-08 | feature/US-08-charts | US-08-COMPLETE | feat(US-08): generate collision analysis charts | US-08: Chart generation | Merged |
+| US-09 | test/US-09-automated-tests | US-09-COMPLETE | test(US-09): add automated tests | US-09: Automated tests | Merged |
+| US-10 | feature/US-10-severity-analysis | US-10-COMPLETE | feat(US-10): implement collision severity analysis | US-10: Collision severity analysis | Merged |
+| US-11 | feature/US-11-road-user-analysis | US-11-COMPLETE | feat(US-11): analyze road user involvement | US-11: Road user analysis | Merged |
+| US-12 | feature/US-12-dashboard | US-12-COMPLETE | feat(US-12): implement interactive dashboard | US-12: Interactive analytics dashboard | Merged |
+| US-13 | feature/US-13-export-results | US-13-COMPLETE | feat(US-13): implement export functionality | US-13: Export analytics results | Merged |
+| US-14 | feature/US-14-filtering | US-14-COMPLETE | feat(US-14): implement filtering functionality | US-14: Dataset filtering feature | Merged |
+| US-15 | refactor/US-15-code-refactor | US-15-COMPLETE | refactor(US-15): improve code structure | US-15: Refactor codebase | Merged |
 
 ---
 
@@ -702,7 +741,7 @@ refactor(US-06): improve validation logic
 <!-- REPO-STATS:START -->
 ## Repository Statistics
 
-**Total Commits:** 77  
+**Total Commits:** 89  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -710,28 +749,28 @@ refactor(US-06): improve validation logic
 
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
-| Hilfritz Camallere | `hilfritz` | 46 | 11 | 55 | 3029 | 264 | Active contributor |
-| Ananya Mandal | `AnanyaMandal-DataAnalyst` | 11 | 2 | 14 | 376 | 112 | Active contributor |
+| Hilfritz Camallere | `hilfritz` | 51 | 12 | 62 | 4415 | 337 | Active contributor |
+| Ananya Mandal | `AnanyaMandal-DataAnalyst` | 12 | 2 | 14 | 376 | 112 | Active contributor |
 | Daniyal Khan | `daniyalnkh` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
-| Joseph Jamoralin | `Joseph-dataanalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
+| Joseph Jamoralin | `Joseph-dataanalyst` | 3 | 1 | 5 | 104 | 5 | Active contributor |
 
 ### Contributor Statistics
 
 | Contributor | Commits | Files Changed | Insertions | Deletions |
 |-------------|---------|---------------|------------|-----------|
-| Hilfritz Camallere | 46 | 55 | 3029 | 264 |
-| Ananya Mandal | 11 | 14 | 376 | 112 |
+| Hilfritz Camallere | 51 | 62 | 4415 | 337 |
+| Ananya Mandal | 12 | 14 | 376 | 112 |
+| Joseph Jamoralin | 3 | 5 | 104 | 5 |
 | Daniyal Khan | 0 | 0 | 0 | 0 |
-| Joseph Jamoralin | 0 | 0 | 0 | 0 |
 
 ### Commit Type Distribution
 
 | Type | Count |
 |------|------:|
-| docs | 27 |
-| feat | 5 |
-| fix | 4 |
-| other | 30 |
+| docs | 31 |
+| feat | 6 |
+| fix | 5 |
+| other | 36 |
 | refactor | 7 |
 | test | 4 |
 
@@ -739,8 +778,8 @@ refactor(US-06): improve validation logic
 
 | Metric | Value |
 |--------|------:|
-| Python Files | 22 |
-| Source Files | 11 |
+| Python Files | 24 |
+| Source Files | 13 |
 | Test Files | 9 |
 | Markdown Files | 2 |
 
@@ -750,12 +789,14 @@ refactor(US-06): improve validation logic
 
 ### Pull Request Statistics
 
-**Total Pull Requests:** 13  
-**Merged Pull Requests:** 13  
+**Total Pull Requests:** 15  
+**Merged Pull Requests:** 15  
 **Open Pull Requests:** 0
 
 | PR # | Title | State | Author |
 |------|-------|-------|--------|
+| 15 | US-12: Interactive Collision Analytics Dashboard | MERGED | hilfritz |
+| 14 | US-10: Feature Collision Severity Analysis | MERGED | Joseph-dataanalyst |
 | 13 | US - 11 road user analysis | MERGED | AnanyaMandal-DataAnalyst |
 | 12 | US-07: Add collision analysis by neighbourhood | MERGED | hilfritz |
 | 11 | US-08-Generating charts to interpret patterns | MERGED | AnanyaMandal-DataAnalyst |
