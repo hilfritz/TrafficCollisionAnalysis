@@ -1,6 +1,6 @@
 ## Repository Statistics
 
-**Total Commits:** 94  
+**Total Commits:** 95  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -26,7 +26,7 @@
 
 | Type | Count |
 |------|------:|
-| docs | 32 |
+| docs | 33 |
 | feat | 6 |
 | fix | 6 |
 | other | 39 |
@@ -50,12 +50,12 @@
 
 **Total Pull Requests:** 17  
 **Merged Pull Requests:** 16  
-**Open Pull Requests:** 1
+**Open Pull Requests:** 0
 
 | PR # | Title | State | Author |
 |------|-------|-------|--------|
 | 17 | US-09: Automated Tests | MERGED | Joseph-dataanalyst |
-| 16 | road_user_analysis | OPEN | AnanyaMandal-DataAnalyst |
+| 16 | road_user_analysis | CLOSED | AnanyaMandal-DataAnalyst |
 | 15 | US-12: Interactive Collision Analytics Dashboard | MERGED | hilfritz |
 | 14 | US-10: Feature Collision Severity Analysis | MERGED | Joseph-dataanalyst |
 | 13 | US - 11 road user analysis | MERGED | AnanyaMandal-DataAnalyst |
