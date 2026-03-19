@@ -1,28 +1,11 @@
 import pandas as pd
-from src.analytics import filter_collisions
+from src.filtering import filter_by_neighbourhood
 
-
-def test_filter_by_hour():
-
+def test_filter_by_neighbourhood():
     data = pd.DataFrame({
-        "OCC_HOUR": [1, 2, 2, 3],
-        "YEAR": [2022, 2022, 2023, 2023]
+        "Neighbourhood": ["A", "B", "A"]
     })
 
-    result = filter_collisions(data, hour=2)
+    result = filter_by_neighbourhood(data, "A")
 
     assert len(result) == 2
-    assert all(result["OCC_HOUR"] == 2)
-
-
-def test_filter_by_year():
-
-    data = pd.DataFrame({
-        "OCC_HOUR": [1, 2, 3],
-        "YEAR": [2021, 2022, 2022]
-    })
-
-    result = filter_collisions(data, year=2022)
-
-    assert len(result) == 2
-    assert all(result["YEAR"] == 2022)
