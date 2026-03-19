@@ -1,5 +1,25 @@
 import pandas as pd
 
+def road_user_analysis(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Analyze collisions by road user type
+    """
+
+    if "INVTYPE" not in df.columns:
+        raise ValueError("Dataset must contain INVTYPE column")
+
+    # Handle missing values
+    df = df.copy()
+    df["INVTYPE"] = df["INVTYPE"].fillna("Unknown")
+
+    summary = (
+        df.groupby("INVTYPE")
+        .size()
+        .reset_index(name="collision_count")
+        .sort_values("collision_count", ascending=False)
+    )
+
+    return summary
 
 def _require_columns(df: pd.DataFrame, required_columns: list[str]) -> None:
     """
