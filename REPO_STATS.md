@@ -1,6 +1,6 @@
 ## Repository Statistics
 
-**Total Commits:** 113  
+**Total Commits:** 116  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -8,7 +8,7 @@
 
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
-| Hilfritz Camallere | `hilfritz` | 60 | 12 | 70 | 4969 | 652 | Active contributor |
+| Hilfritz Camallere | `hilfritz` | 61 | 12 | 70 | 4969 | 652 | Active contributor |
 | Ananya Mandal | `AnanyaMandal-DataAnalyst` | 16 | 4 | 19 | 498 | 135 | Active contributor |
 | Daniyal Khan | `daniyalnkh` | 0 | 2 | 0 | 0 | 0 | Active contributor |
 | Joseph Jamoralin | `Joseph-dataanalyst` | 5 | 2 | 6 | 122 | 10 | Active contributor |
@@ -17,7 +17,7 @@
 
 | Contributor | Commits | Files Changed | Insertions | Deletions |
 |-------------|---------|---------------|------------|-----------|
-| Hilfritz Camallere | 60 | 70 | 4969 | 652 |
+| Hilfritz Camallere | 61 | 70 | 4969 | 652 |
 | Ananya Mandal | 16 | 19 | 498 | 135 |
 | Joseph Jamoralin | 5 | 6 | 122 | 10 |
 | Daniyal Khan | 0 | 0 | 0 | 0 |
@@ -26,10 +26,10 @@
 
 | Type | Count |
 |------|------:|
-| docs | 37 |
-| feat | 9 |
+| docs | 38 |
+| feat | 10 |
 | fix | 7 |
-| other | 48 |
+| other | 49 |
 | refactor | 7 |
 | test | 5 |
 
@@ -49,13 +49,13 @@
 ### Pull Request Statistics
 
 **Total Pull Requests:** 20  
-**Merged Pull Requests:** 18  
-**Open Pull Requests:** 1
+**Merged Pull Requests:** 19  
+**Open Pull Requests:** 0
 
 | PR # | Title | State | Author |
 |------|-------|-------|--------|
 | 20 | feat(US-06): Day-of-Week and Monthly Analysis with TDD + Refactor | MERGED | daniyalnkh |
-| 19 | feat(US-12): add day-of-week and monthly analysis to dashboard | OPEN | daniyalnkh |
+| 19 | feat(US-12): add day-of-week and monthly analysis to dashboard | MERGED | daniyalnkh |
 | 18 | US-14: Filtering Feature | MERGED | AnanyaMandal-DataAnalyst |
 | 17 | US-09: Automated Tests | MERGED | Joseph-dataanalyst |
 | 16 | road_user_analysis | CLOSED | AnanyaMandal-DataAnalyst |
