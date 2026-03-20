@@ -741,7 +741,7 @@ refactor(US-06): improve validation logic
 <!-- REPO-STATS:START -->
 ## Repository Statistics
 
-**Total Commits:** 96  
+**Total Commits:** 97  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -750,8 +750,8 @@ refactor(US-06): improve validation logic
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
 | Hilfritz Camallere | `hilfritz` | 53 | 12 | 66 | 4497 | 339 | Active contributor |
-| Ananya Mandal | `AnanyaMandal-DataAnalyst` | 12 | 3 | 14 | 376 | 112 | Active contributor |
-| Daniyal Khan | `daniyalnkh` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
+| Ananya Mandal | `AnanyaMandal-DataAnalyst` | 12 | 4 | 14 | 376 | 112 | Active contributor |
+| Daniyal Khan | `daniyalnkh` | 0 | 2 | 0 | 0 | 0 | Active contributor |
 | Joseph Jamoralin | `Joseph-dataanalyst` | 5 | 2 | 6 | 122 | 10 | Active contributor |
 
 ### Contributor Statistics
@@ -767,7 +767,7 @@ refactor(US-06): improve validation logic
 
 | Type | Count |
 |------|------:|
-| docs | 34 |
+| docs | 35 |
 | feat | 6 |
 | fix | 6 |
 | other | 39 |
@@ -789,12 +789,15 @@ refactor(US-06): improve validation logic
 
 ### Pull Request Statistics
 
-**Total Pull Requests:** 17  
+**Total Pull Requests:** 20  
 **Merged Pull Requests:** 16  
-**Open Pull Requests:** 0
+**Open Pull Requests:** 3
 
 | PR # | Title | State | Author |
 |------|-------|-------|--------|
+| 20 | feat(US-06): Day-of-Week and Monthly Analysis with TDD + Refactor | OPEN | daniyalnkh |
+| 19 | feat(US-12): add day-of-week and monthly analysis to dashboard | OPEN | daniyalnkh |
+| 18 | Tdd filtering | OPEN | AnanyaMandal-DataAnalyst |
 | 17 | US-09: Automated Tests | MERGED | Joseph-dataanalyst |
 | 16 | road_user_analysis | CLOSED | AnanyaMandal-DataAnalyst |
 | 15 | US-12: Interactive Collision Analytics Dashboard | MERGED | hilfritz |
