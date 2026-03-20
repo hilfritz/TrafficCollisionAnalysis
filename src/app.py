@@ -1,7 +1,7 @@
 # src/app.py
-from datetime import datetime
+
 from pathlib import Path
-from time import perf_counter
+from src.common import log_timed_block, reset_log, log_message, benchmark_call
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import altair as alt
 import pandas as pd
@@ -17,46 +17,6 @@ from src.analytics import collisions_by_day_of_week, collisions_by_month
 
 DEFAULT_PREPARED_DATASET_PATH = Path("data/processed/traffic_collisions_prepared.parquet")
 LOG_FILE = Path("logs/app_benchmark.log")
-
-
-def reset_log():
-    LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-    LOG_FILE.write_text("", encoding="utf-8")
-
-
-def log_message(message: str):
-    timestamp = datetime.now().strftime("%H:%M:%S")
-    line = f"[{timestamp}] {message}"
-    print(line)
-    with open(LOG_FILE, "a", encoding="utf-8") as f:
-        f.write(line + "\n")
-
-
-def log_timed_block(name: str):
-    log_message(f"{name} START")
-    start = perf_counter()
-
-    def end():
-        elapsed = perf_counter() - start
-        elapsed_ms = elapsed * 1000
-        log_message(f"{name} END took {elapsed:.6f}s ({elapsed_ms:.2f} ms)")
-        return elapsed
-
-    return end
-
-
-def benchmark_call(timings: list[dict], func_name: str, func, *args, **kwargs):
-    end_log = log_timed_block(func_name)
-    result = func(*args, **kwargs)
-    elapsed = end_log()
-    timings.append(
-        {
-            "Function": func_name,
-            "Execution Time (s)": round(elapsed, 6),
-            "Execution Time (ms)": round(elapsed * 1000, 2),
-        }
-    )
-    return result
 
 
 @st.cache_data
