@@ -133,10 +133,49 @@ def test_collisions_by_neighbourhood_raises_error_if_column_missing():
 def test_collision_severity_analysis_returns_expected_rows():
     df = pd.DataFrame(
         {
+            "severity_class": ["Fatal", "Injury", "Property Damage", "Injury"]
+        }
+    )
+
+    result = collision_severity_analysis(df)
+
+    assert len(result) == 3
+    assert list(result["severity_type"]) == ["Fatal", "Injury", "Property Damage"]
+    assert list(result["value"]) == [1, 2, 1]
+
+
+def test_collision_severity_analysis_returns_empty_when_column_missing():
+    df = pd.DataFrame(
+        {
             "FATALITIES": [1, 0],
             "INJURY_COLLISIONS": [True, False],
             "PD_COLLISIONS": [False, True],
         }
     )
+
     result = collision_severity_analysis(df)
-    assert len(result) == 3
+
+    assert result.empty
+    assert list(result.columns) == ["severity_type", "value"]
+
+
+def test_collision_severity_analysis_counts_zero_correctly():
+    df = pd.DataFrame(
+        {
+            "severity_class": ["Fatal", "Fatal"]
+        }
+    )
+
+    result = collision_severity_analysis(df)
+
+    assert list(result["severity_type"]) == ["Fatal", "Injury", "Property Damage"]
+    assert list(result["value"]) == [2, 0, 0]
+
+
+def test_collision_severity_analysis_handles_empty_dataframe():
+    df = pd.DataFrame({"severity_class": pd.Series([], dtype="object")})
+
+    result = collision_severity_analysis(df)
+
+    assert list(result["severity_type"]) == ["Fatal", "Injury", "Property Damage"]
+    assert list(result["value"]) == [0, 0, 0]

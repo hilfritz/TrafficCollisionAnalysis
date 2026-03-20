@@ -99,7 +99,7 @@ toronto-traffic-collision-analytics/
 ├── outputs/
 ```
 
-A small **sample dataset may be included for demonstration**, but the full dataset must be added manually.
+The dataset must be **added manually**.
 
 
 ---
@@ -287,37 +287,9 @@ geographic, and behavioural patterns within Toronto traffic collision data.
 Total Collisions: 28,000+
 Peak Hour: 17:00
 ```
+### Key Collision Insights
 
-### Top Collision Hours
-
-| Hour | Collisions |
-|----|----|
-| 17 | 1820 |
-| 16 | 1750 |
-| 18 | 1690 |
-
-### High Risk Neighbourhoods
-
-| Neighbourhood | Collisions |
-|------|------|
-| Downtown | 1430 |
-| North York | 1215 |
-| Scarborough | 1180 |
-| Etobicoke | 990 |
-
-### Vulnerable Road Users
-
-| Category | Collisions |
-|------|------|
-| Pedestrian | 2120 |
-| Bicycle | 1305 |
-| Motorcycle | 890 |
-
-Example visualization:
-
-```
-outputs/collisions_by_hour.png
-```
+![Collision Statistics](docs/images/collision_stats.jpg)
 
 ---
 
@@ -386,8 +358,7 @@ notebooks/
 Acceptance Criteria:
 
 - Product backlog created
-- User stories documented in README
-- Each story includes description and story points
+- Story includes description and story points
 
 ---
 
@@ -583,24 +554,22 @@ Each story followed the **Red → Green → Refactor** workflow.
 
 ## Traceability Matrix
 
-| User Story | Branch | Tag | Commit Summary | PR Title | Status |
-|-------------|--------|------|----------------|----------|--------|
-| US-01 | chore/US-01-repo-setup | US-01-COMPLETE | chore(US-01): initialize repository structure | US-01: Project repository setup | Merged |
-| US-02 | docs/US-02-user-story-identification | US-02-COMPLETE | docs(US-02): add user stories to README | US-02: User story identification | Merged |
-| US-03 | chore/US-03-sprint-planning | US-03-COMPLETE | chore(US-03): define sprint scope | US-03: Sprint planning | Merged |
-| US-04 | feature/US-04-data-loader | US-04-COMPLETE | feat(US-04): implement dataset loader | US-04: Load dataset | Merged |
-| US-05 | feature/US-05-data-cleaning | US-05-COMPLETE | feat(US-05): implement data cleaning utilities | US-05: Clean collision data | Merged |
-| US-06 | feature/US-06-collisions-by-hour | US-06-COMPLETE | feat(US-06): implement hourly collision aggregation | US-06: Collision analysis by hour | Merged |
-| US-07 | feature/US-07-collisions-by-neighbourhood | US-07-COMPLETE | feat(US-07): implement neighbourhood collision analysis | US-07: Collision analysis by neighbourhood | Merged |
-| US-08 | feature/US-08-charts | US-08-COMPLETE | feat(US-08): generate collision analysis charts | US-08: Chart generation | Merged |
-| US-09 | test/US-09-automated-tests | US-09-COMPLETE | test(US-09): add automated tests | US-09: Automated tests | Merged |
-| US-10 | feature/US-10-severity-analysis | US-10-COMPLETE | feat(US-10): implement collision severity analysis | US-10: Collision severity analysis | Merged |
-| US-11 | feature/US-11-road-user-analysis | US-11-COMPLETE | feat(US-11): analyze road user involvement | US-11: Road user analysis | Merged |
-| US-12 | feature/US-12-dashboard | US-12-COMPLETE | feat(US-12): implement interactive dashboard | US-12: Interactive analytics dashboard | Merged |
-| US-13 | feature/US-13-export-results | US-13-COMPLETE | feat(US-13): implement export functionality | US-13: Export analytics results | Merged |
-| US-14 | feature/US-14-filtering | US-14-COMPLETE | feat(US-14): implement filtering functionality | US-14: Dataset filtering feature | Merged |
-| US-15 | refactor/US-15-code-refactor | US-15-COMPLETE | refactor(US-15): improve code structure | US-15: Refactor codebase | Merged |
 
+| User Story | Branch | Tag | PR Title |
+|-------------|--------|------|----------|
+| US-01 | chore/US-01-repo-setup | US-01-COMPLETE | US-01: Project repository setup |
+| US-04 | feature/US-04-data-loader | US-04-COMPLETE | US-04: Load dataset |
+| US-05 | feature/US-05-data-cleaning | US-05-COMPLETE | US-05: Clean collision data |
+| US-06 | feature/US-06-collisions-by-hour | US-06-COMPLETE | US-06: Collision analysis by hour |
+| US-07 | feature/US-07-collisions-by-neighbourhood | US-07-COMPLETE | US-07: Collision analysis by neighbourhood |
+| US-08 | feature/US-08-charts | US-08-COMPLETE | US-08: Chart generation |
+| US-09 | test/US-09-automated-tests | US-09-COMPLETE | US-09: Automated tests |
+| US-10 | feature/US-10-Collision-severity-analysis | US-10-COMPLETE | US-10: Collision severity analysis |
+| US-11 | TT06-road-user-analysis | US-11-COMPLETE | US-11: Road user analysis |
+| US-12 | feature/US-12-dashboard-enhancements | US-12-COMPLETE | US-12: Interactive analytics dashboard |
+| US-13 | TT06-road-user-analysis | US-13-COMPLETE | US-13: Export analytics results |
+| US-14 | tdd-filtering | US-14-COMPLETE | US-14: Dataset filtering feature |
+| US-15 | refactor/US-15-code-refactor | US-15-COMPLETE | US-15: Refactor codebase |
 ---
 
 ## Git Workflow & Naming Conventions

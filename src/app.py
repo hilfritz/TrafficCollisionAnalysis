@@ -1,8 +1,8 @@
 # src/app.py
-from datetime import datetime
-from pathlib import Path
-from time import perf_counter
 
+from pathlib import Path
+from src.common import log_timed_block, reset_log, log_message, benchmark_call
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import altair as alt
 import pandas as pd
 import pydeck as pdk
@@ -10,53 +10,13 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 from src.config import OUTPUT_DIR
-from src.analytics import collisions_by_day_of_week, collisions_by_month
+from src.analytics import collision_severity_analysis, collisions_by_day_of_week, collisions_by_division, collisions_by_hour, collisions_by_month, collisions_by_neighbourhood, forecast_collision_trend, road_user_analysis, severity_trend_over_time, total_collisions_trend_over_time
 
 # Dashboard with day-of-week and monthly analysis (US-12)
 
 
 DEFAULT_PREPARED_DATASET_PATH = Path("data/processed/traffic_collisions_prepared.parquet")
 LOG_FILE = Path("logs/app_benchmark.log")
-
-
-def reset_log():
-    LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-    LOG_FILE.write_text("", encoding="utf-8")
-
-
-def log_message(message: str):
-    timestamp = datetime.now().strftime("%H:%M:%S")
-    line = f"[{timestamp}] {message}"
-    print(line)
-    with open(LOG_FILE, "a", encoding="utf-8") as f:
-        f.write(line + "\n")
-
-
-def log_timed_block(name: str):
-    log_message(f"{name} START")
-    start = perf_counter()
-
-    def end():
-        elapsed = perf_counter() - start
-        elapsed_ms = elapsed * 1000
-        log_message(f"{name} END took {elapsed:.6f}s ({elapsed_ms:.2f} ms)")
-        return elapsed
-
-    return end
-
-
-def benchmark_call(timings: list[dict], func_name: str, func, *args, **kwargs):
-    end_log = log_timed_block(func_name)
-    result = func(*args, **kwargs)
-    elapsed = end_log()
-    timings.append(
-        {
-            "Function": func_name,
-            "Execution Time (s)": round(elapsed, 6),
-            "Execution Time (ms)": round(elapsed * 1000, 2),
-        }
-    )
-    return result
 
 
 @st.cache_data
@@ -174,229 +134,6 @@ def apply_road_user_filter(
     end_log()
     return result
 
-
-def collisions_by_hour(df: pd.DataFrame) -> pd.DataFrame:
-    end_log = log_timed_block("collisions_by_hour")
-    if "OCC_HOUR" not in df.columns:
-        end_log()
-        return pd.DataFrame(columns=["OCC_HOUR", "collision_count"])
-
-    result = (
-        df.dropna(subset=["OCC_HOUR"])
-        .groupby("OCC_HOUR")
-        .size()
-        .reset_index(name="collision_count")
-        .sort_values(["collision_count", "OCC_HOUR"], ascending=[False, True])
-        .reset_index(drop=True)
-    )
-    end_log()
-    return result
-
-
-def collisions_by_neighbourhood(df: pd.DataFrame, top_n: int = 10) -> pd.DataFrame:
-    end_log = log_timed_block("collisions_by_neighbourhood")
-    if "NEIGHBOURHOOD_158" not in df.columns:
-        end_log()
-        return pd.DataFrame(columns=["NEIGHBOURHOOD_158", "collision_count"])
-
-    result = (
-        df.dropna(subset=["NEIGHBOURHOOD_158"])
-        .groupby("NEIGHBOURHOOD_158")
-        .size()
-        .reset_index(name="collision_count")
-        .sort_values("collision_count", ascending=False)
-        .head(top_n)
-        .reset_index(drop=True)
-    )
-    end_log()
-    return result
-
-
-def collisions_by_division(df: pd.DataFrame, top_n: int = 10) -> pd.DataFrame:
-    end_log = log_timed_block("collisions_by_division")
-    if "DIVISION" not in df.columns:
-        end_log()
-        return pd.DataFrame(columns=["DIVISION", "collision_count"])
-
-    result = (
-        df.dropna(subset=["DIVISION"])
-        .groupby("DIVISION")
-        .size()
-        .reset_index(name="collision_count")
-        .sort_values("collision_count", ascending=False)
-        .head(top_n)
-        .reset_index(drop=True)
-    )
-    end_log()
-    return result
-
-def collisions_by_day_of_week(df: pd.DataFrame) -> pd.DataFrame:
-    end_log = log_timed_block("collisions_by_day_of_week")
-
-    if "OCC_DOW" not in df.columns:
-        end_log()
-        return pd.DataFrame(columns=["day_of_week", "collision_count"])
-
-    order = [
-        "Monday", "Tuesday", "Wednesday", "Thursday",
-        "Friday", "Saturday", "Sunday"
-    ]
-
-    result = (
-        df.dropna(subset=["OCC_DOW"])
-        .groupby("OCC_DOW")
-        .size()
-        .reset_index(name="collision_count")
-        .rename(columns={"OCC_DOW": "day_of_week"})
-    )
-
-    result["day_of_week"] = pd.Categorical(
-        result["day_of_week"],
-        categories=order,
-        ordered=True,
-    )
-    result = result.sort_values("day_of_week").reset_index(drop=True)
-
-    end_log()
-    return result
-
-def collisions_by_month(df: pd.DataFrame) -> pd.DataFrame:
-    end_log = log_timed_block("collisions_by_month")
-
-    if "MONTH" not in df.columns:
-        end_log()
-        return pd.DataFrame(columns=["month_name", "collision_count"])
-
-    month_lookup = {
-        1: "January",
-        2: "February",
-        3: "March",
-        4: "April",
-        5: "May",
-        6: "June",
-        7: "July",
-        8: "August",
-        9: "September",
-        10: "October",
-        11: "November",
-        12: "December",
-    }
-
-    result = df.copy()
-    result["MONTH"] = pd.to_numeric(result["MONTH"], errors="coerce")
-    result = result.dropna(subset=["MONTH"])
-
-    if result.empty:
-        end_log()
-        return pd.DataFrame(columns=["month_name", "collision_count"])
-
-    result["MONTH"] = result["MONTH"].astype(int)
-
-    result = (
-        result.groupby("MONTH")
-        .size()
-        .reset_index(name="collision_count")
-        .rename(columns={"MONTH": "month"})
-        .sort_values("month")
-        .reset_index(drop=True)
-    )
-
-    result["month_name"] = result["month"].map(month_lookup)
-    result["month_name"] = pd.Categorical(
-        result["month_name"],
-        categories=[
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December",
-        ],
-        ordered=True,
-    )
-
-    end_log()
-    return result
-
-def collision_severity_analysis(df: pd.DataFrame) -> pd.DataFrame:
-    end_log = log_timed_block("collision_severity_analysis")
-
-    if "severity_class" not in df.columns:
-        end_log()
-        return pd.DataFrame(columns=["severity_type", "value"])
-
-    result = pd.DataFrame(
-        {
-            "severity_type": ["Fatal", "Injury", "Property Damage"],
-            "value": [
-                int((df["severity_class"] == "Fatal").sum()),
-                int((df["severity_class"] == "Injury").sum()),
-                int((df["severity_class"] == "Property Damage").sum()),
-            ],
-        }
-    )
-
-    end_log()
-    return result
-
-
-def road_user_analysis(df: pd.DataFrame) -> pd.DataFrame:
-    end_log = log_timed_block("road_user_analysis")
-
-    result = pd.DataFrame(
-        {
-            "road_user_type": ["Pedestrian", "Bicycle", "Motorcycle"],
-            "collision_count": [
-                int(df["PEDESTRIAN"].eq("YES").sum()) if "PEDESTRIAN" in df.columns else 0,
-                int(df["BICYCLE"].eq("YES").sum()) if "BICYCLE" in df.columns else 0,
-                int(df["MOTORCYCLE"].eq("YES").sum()) if "MOTORCYCLE" in df.columns else 0,
-            ],
-        }
-    )
-
-    end_log()
-    return result
-
-
-def severity_trend_over_time(df: pd.DataFrame, selected_severity: str) -> pd.DataFrame:
-    end_log = log_timed_block("severity_trend_over_time")
-
-    if "OCC_DATE" not in df.columns or "severity_class" not in df.columns:
-        end_log()
-        return pd.DataFrame(columns=["date", "severity_type", "value"])
-
-    result = df.copy()
-    result["OCC_DATE"] = pd.to_datetime(result["OCC_DATE"], errors="coerce")
-    result = result.dropna(subset=["OCC_DATE"])
-
-    if result.empty:
-        end_log()
-        return pd.DataFrame(columns=["date", "severity_type", "value"])
-
-    severity_order = ["Fatal", "Injury", "Property Damage"]
-
-    if selected_severity == "All Severities":
-        result = result[result["severity_class"].isin(severity_order)].copy()
-    elif selected_severity in severity_order:
-        result = result[result["severity_class"] == selected_severity].copy()
-    else:
-        end_log()
-        return pd.DataFrame(columns=["date", "severity_type", "value"])
-
-    if result.empty:
-        end_log()
-        return pd.DataFrame(columns=["date", "severity_type", "value"])
-
-    trend_df = (
-        result.groupby([result["OCC_DATE"].dt.date, "severity_class"])
-        .size()
-        .reset_index(name="value")
-        .rename(columns={"OCC_DATE": "date", "severity_class": "severity_type"})
-    )
-
-    trend_df["date"] = pd.to_datetime(trend_df["date"])
-    trend_df = trend_df.sort_values(["date", "severity_type"]).reset_index(drop=True)
-
-    end_log()
-    return trend_df
-
-
 def build_severity_map_dataframe(filtered_df: pd.DataFrame) -> pd.DataFrame:
     end_log = log_timed_block("build_severity_map_dataframe")
 
@@ -462,7 +199,6 @@ def render_map_legend():
     components.html(
         """
         <div style="padding:5px 5px; border:1px solid #ddd; border-radius:8px; background-color:#fafafa; margin-top:8px;">
-            <b>Legend</b><br><br>
             <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
                 <div style="display:flex; align-items:center; gap:6px;">
                     <div style="width:14px; height:14px; border-radius:50%; background:#dc3545;"></div>
@@ -699,9 +435,7 @@ def main() -> None:
     st.set_page_config(page_title="Toronto Collision Risk Dashboard", layout="wide")
 
     st.title("Toronto Collision Risk Dashboard")
-    st.caption(
-        "Executive view of collision volume, severity, road-user exposure, and spatial risk patterns."
-    )
+
 
     dataset_path = st.sidebar.text_input(
         "Prepared dataset path",
@@ -719,13 +453,48 @@ def main() -> None:
     # 1. Time Window
     recent_days_option = st.sidebar.selectbox(
         "Time Window",
-        ["All Time", "30 Days", "60 Days", "90 Days", "180 Days", "365 Days"],
-        index=3,
+        [
+            "All Time",
+            "7 Days",
+            "14 Days",
+            "30 Days",
+            "60 Days",
+            "90 Days",
+            "180 Days",
+            "365 Days",
+        ],
+        index=3,  # still default to 90 Days
     )
     log_message(f"TREND WINDOW selected: {recent_days_option}")
+    show_forecast = st.sidebar.checkbox("Show Forecast", value=True)
+    forecast_horizon_option = st.sidebar.selectbox(
+        "Forecast Horizon",
+        [
+            "7 Days",
+            "14 Days",
+            "30 Days",
+            "60 Days",
+            "90 Days",
+        ],
+        index=0,  # default still 7 Days
+    )
+
+    forecast_horizon_lookup = {
+        "7 Days": 7,
+        "14 Days": 14,
+        "30 Days": 30,
+        "60 Days": 60,
+        "90 Days": 90,
+    }
+
+    forecast_horizon = forecast_horizon_lookup[forecast_horizon_option]
+    log_message(f"SHOW FORECAST selected: {show_forecast}")
+    log_message(f"FORECAST HORIZON selected: {forecast_horizon}")
 
     recent_days_lookup = {
         "All Time": None,
+        "7 Days": 7,
+        "14 Days": 14,
         "30 Days": 30,
         "60 Days": 60,
         "90 Days": 90,
@@ -898,6 +667,29 @@ def main() -> None:
         filtered_df,
         collision_severity,
     )
+    total_trend_df = benchmark_call(
+        timings,
+        "total_collisions_trend_over_time",
+        total_collisions_trend_over_time,
+        filtered_df,
+    )
+
+    forecast_df = (
+        benchmark_call(
+            timings,
+            "forecast_collision_trend",
+            forecast_collision_trend,
+            total_trend_df,
+            forecast_horizon,
+        )
+        if show_forecast
+        else pd.DataFrame(columns=["date", "value", "series_type"])
+    )
+    if show_forecast and not total_trend_df.empty:
+        if len(total_trend_df) < forecast_horizon:
+            st.warning(
+                "Forecast horizon is longer than available data. Results may be unreliable."
+            )
     day_of_week_df = (
         benchmark_call(
             timings,
@@ -950,7 +742,7 @@ def main() -> None:
     kpi6.metric("Time Window", recent_days_option)
 
     # Row 2: road user exposure KPIs
-    st.subheader("Road Users Involved")
+    #st.subheader("Road Users Involved")
     r1, r2, r3 = st.columns(3)
 
     pedestrian_count = (
@@ -969,9 +761,9 @@ def main() -> None:
         else 0
     )
 
-    r1.metric("Pedestrian", pedestrian_count)
-    r2.metric("Bicycle", bicycle_count)
-    r3.metric("Motorcycle", motorcycle_count)
+    r1.metric("Pedestrians", pedestrian_count)
+    r2.metric("Bicycles", bicycle_count)
+    r3.metric("Motorcycles", motorcycle_count)
 
 
 
@@ -979,37 +771,127 @@ def main() -> None:
         f"Filters applied — Year: {selected_years or 'Latest'} | "
         f"Division: {selected_divisions or 'All'} | "
         f"Neighbourhood: {selected_neighbourhoods or 'All'} | "
-        f"Severity: {collision_severity}"
+        f"Severity: {collision_severity} | "
+        f"Window: {recent_days_option}"
     )
 
     # Row 1: Trend
-    st.subheader("Collision Trend")
-    if not trend_df.empty:
-        end_chart = log_timed_block("st.altair_chart.trend")
+    col_chart, col_legend = st.columns([4, 1], gap="large")
 
-        trend_chart = (
-            alt.Chart(trend_df)
-            .mark_line(point=True)
-            .encode(
-                x=alt.X("date:T", title="Date"),
-                y=alt.Y("value:Q", title="Collision Count"),
-                color=alt.Color(
-                    "severity_type:N",
-                    scale=alt.Scale(
-                        domain=["Fatal", "Injury", "Property Damage"],
-                        range=["#dc3545", "#ff8c00", "#ffc107"],
+    with col_chart:
+        st.subheader("Collision Trend")
+        #fritz
+        if not trend_df.empty:
+            end_chart = log_timed_block("st.altair_chart.trend")
+
+            charts = []
+
+            # 1. Existing severity trend (UNCHANGED)
+            severity_chart = (
+                alt.Chart(trend_df)
+                .mark_line(point=True)
+                .encode(
+                    x=alt.X("date:T", title="Date"),
+                    y=alt.Y("value:Q", title="Collision Count"),
+                    color=alt.Color(
+                        "severity_type:N",
+                        scale=alt.Scale(
+                            domain=["Fatal", "Injury", "Property Damage"],
+                            range=["#dc3545", "#ff8c00", "#ffc107"],
+                        ),
+                        legend=None,
                     ),
-                    legend=alt.Legend(title="Severity"),
-                ),
-                tooltip=["date:T", "severity_type:N", "value:Q"],
+                    tooltip=["date:T", "severity_type:N", "value:Q"],
+                )
             )
+            charts.append(severity_chart)
+
+            # 2. Total actual (BLUE solid)
+            if not total_trend_df.empty:
+                total_chart = (
+                    alt.Chart(total_trend_df)
+                    .mark_line(point=False, strokeWidth=3)
+                    .encode(
+                        x="date:T",
+                        y="value:Q",
+                        color=alt.value("#1f77b4"),
+                        tooltip=["date:T", "value:Q"],
+                    )
+                )
+                charts.append(total_chart)
+
+            # 3. Forecast (BLUE dashed)
+            if show_forecast and not forecast_df.empty:
+                forecast_chart = (
+                    alt.Chart(forecast_df)
+                    .mark_line(point=False, strokeDash=[6, 4], strokeWidth=3)
+                    .encode(
+                        x="date:T",
+                        y="value:Q",
+                        color=alt.value("#1f77b4"),
+                        tooltip=["date:T", "value:Q"],
+                    )
+                )
+                charts.append(forecast_chart)
+
+            st.altair_chart(alt.layer(*charts), use_container_width=True)
+            
+            end_chart()
+
+
+            if show_forecast and forecast_df.empty:
+                st.info("Not enough data available to generate a forecast.")
+        else:
+            st.info("No trend data available for the current filter selection.")
+    with col_legend:
+        components.html(
+            """
+            <br><br>
+            <div style="font-family:sans-serif; font-size:14px; color:white; padding-top:8px;">
+
+                <div style="font-weight:600; margin-bottom:8px;">Actual</div>
+
+                <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="width:30px; border-top:3px solid #dc3545;"></div>
+                        <span>Fatal</span>
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="width:30px; border-top:3px solid #ff8c00;"></div>
+                        <span>Injury</span>
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="width:30px; border-top:3px solid #ffc107;"></div>
+                        <span>Property Damage</span>
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="width:30px; border-top:3px solid #1f77b4;"></div>
+                        <span>Total Collisions</span>
+                    </div>
+                </div>
+
+                <div style="font-weight:600; margin-bottom:8px; margin-top:20px;">Forecast</div>
+
+                <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="width:30px; border-top:3px dashed #1f77b4;"></div>
+                        <span>Total (Forecast)</span>
+                    </div>
+                </div>
+
+                <!-- 👇 Explanation -->
+                <div style="font-size:14px; color:#cccccc; line-height:1.4; margin-top:20px;">
+                    Severity-level forecasting is not shown due to variability in low-frequency events (e.g., fatal collisions).
+                </div>
+
+            </div>
+            """,
+            height=380,
         )
-
-        st.altair_chart(trend_chart, use_container_width=True)
-        end_chart()
-    else:
-        st.info("No trend data available for the current filter selection.")
-
+    
     # Row 2: Hour + Neighbourhoods
     col1, col2 = st.columns(2, gap="large")
 
@@ -1043,6 +925,7 @@ def main() -> None:
         if not day_of_week_df.empty:
             end_bar = log_timed_block("st.bar_chart.day_of_week")
             st.bar_chart(day_of_week_df.set_index("day_of_week")["collision_count"])
+            
             end_bar()
         else:
             st.info("No day-of-week data available for the current filter selection.")
@@ -1138,12 +1021,12 @@ def main() -> None:
         }
     )
 
-    with st.expander("Performance Benchmark"):
-        st.dataframe(pd.DataFrame(timings), use_container_width=True, hide_index=True)
+    #with st.expander("Performance Benchmark"):
+    #    st.dataframe(pd.DataFrame(timings), use_container_width=True, hide_index=True)
 
-    with st.expander("Benchmark Log File"):
-        if LOG_FILE.exists():
-            st.code(LOG_FILE.read_text(encoding="utf-8"), language="text")
+    #with st.expander("Benchmark Log File"):
+    #    if LOG_FILE.exists():
+    #        st.code(LOG_FILE.read_text(encoding="utf-8"), language="text")
 
 
 if __name__ == "__main__":

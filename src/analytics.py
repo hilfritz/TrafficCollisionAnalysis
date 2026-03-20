@@ -1,6 +1,8 @@
 # src/analytics.py
 import pandas as pd
 import os
+from src.common import log_timed_block, reset_log, log_message, benchmark_call
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 def _require_columns(df: pd.DataFrame, required_columns: list[str]) -> None:
     """
@@ -87,6 +89,7 @@ def collisions_by_neighbourhood(df: pd.DataFrame, top_n: int = 10) -> pd.DataFra
         - NEIGHBOURHOOD_158
         - collision_count
     """
+    end_log = log_timed_block("collisions_by_neighbourhood")
     _require_columns(df, ["NEIGHBOURHOOD_158"])
 
     result = (
@@ -98,34 +101,50 @@ def collisions_by_neighbourhood(df: pd.DataFrame, top_n: int = 10) -> pd.DataFra
         .head(top_n)
         .reset_index(drop=True)
     )
-
+    end_log()
     return result
-
 
 def collision_severity_analysis(df: pd.DataFrame) -> pd.DataFrame:
     """
     Summarize fatalities, injury collisions, and property damage collisions.
     """
-    _require_columns(df, ["FATALITIES", "INJURY_COLLISIONS", "PD_COLLISIONS"])
+    end_log = log_timed_block("collision_severity_analysis")
 
-    fatalities = int(pd.to_numeric(df["FATALITIES"], errors="coerce").fillna(0).sum())
-    injury_collisions = int(df["INJURY_COLLISIONS"].fillna(False).astype(bool).sum())
-    property_damage_collisions = int(df["PD_COLLISIONS"].fillna(False).astype(bool).sum())
+    if "severity_class" not in df.columns:
+        end_log()
+        return pd.DataFrame(columns=["severity_type", "value"])
 
-    return pd.DataFrame(
+    result = pd.DataFrame(
         {
-            "severity_type": [
-                "Fatalities",
-                "Injury Collisions",
-                "Property Damage Collisions",
-            ],
+            "severity_type": ["Fatal", "Injury", "Property Damage"],
             "value": [
-                fatalities,
-                injury_collisions,
-                property_damage_collisions,
+                int((df["severity_class"] == "Fatal").sum()),
+                int((df["severity_class"] == "Injury").sum()),
+                int((df["severity_class"] == "Property Damage").sum()),
             ],
         }
     )
+
+    end_log()
+    return result
+
+def collisions_by_division(df: pd.DataFrame, top_n: int = 10) -> pd.DataFrame:
+    end_log = log_timed_block("collisions_by_division")
+    if "DIVISION" not in df.columns:
+        end_log()
+        return pd.DataFrame(columns=["DIVISION", "collision_count"])
+
+    result = (
+        df.dropna(subset=["DIVISION"])
+        .groupby("DIVISION")
+        .size()
+        .reset_index(name="collision_count")
+        .sort_values("collision_count", ascending=False)
+        .head(top_n)
+        .reset_index(drop=True)
+    )
+    end_log()
+    return result
 
 
 def road_user_analysis(df: pd.DataFrame) -> pd.DataFrame:
@@ -224,68 +243,215 @@ def export_results(df: pd.DataFrame, output_path: str) -> str:
 
     return output_path
 
+
 def collisions_by_day_of_week(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Aggregate collisions by day of week to identify high-risk days.
-    """
-    _require_columns(df, ["OCC_DOW"])
+    end_log = log_timed_block("collisions_by_day_of_week")
+
+    if "OCC_DOW" not in df.columns:
+        end_log()
+        return pd.DataFrame(columns=["day_of_week", "collision_count"])
+
+    order = [
+        "Monday", "Tuesday", "Wednesday", "Thursday",
+        "Friday", "Saturday", "Sunday"
+    ]
 
     result = (
         df.dropna(subset=["OCC_DOW"])
         .groupby("OCC_DOW")
         .size()
         .reset_index(name="collision_count")
-        .sort_values(["collision_count", "OCC_DOW"], ascending=[False, True])
-        .reset_index(drop=True)
+        .rename(columns={"OCC_DOW": "day_of_week"})
     )
 
+    result["day_of_week"] = pd.Categorical(
+        result["day_of_week"],
+        categories=order,
+        ordered=True,
+    )
+    result = result.sort_values("day_of_week").reset_index(drop=True)
+
+    end_log()
     return result
 
-
 def collisions_by_month(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Aggregate collisions by month to identify seasonal patterns.
-    """
-    _require_columns(df, ["OCC_MONTH"])
+    end_log = log_timed_block("collisions_by_month")
+
+    if "MONTH" not in df.columns:
+        end_log()
+        return pd.DataFrame(columns=["month_name", "collision_count"])
+
+    month_lookup = {
+        1: "January",
+        2: "February",
+        3: "March",
+        4: "April",
+        5: "May",
+        6: "June",
+        7: "July",
+        8: "August",
+        9: "September",
+        10: "October",
+        11: "November",
+        12: "December",
+    }
+
+    result = df.copy()
+    result["MONTH"] = pd.to_numeric(result["MONTH"], errors="coerce")
+    result = result.dropna(subset=["MONTH"])
+
+    if result.empty:
+        end_log()
+        return pd.DataFrame(columns=["month_name", "collision_count"])
+
+    result["MONTH"] = result["MONTH"].astype(int)
 
     result = (
-        df.dropna(subset=["OCC_MONTH"])
-        .groupby("OCC_MONTH")
+        result.groupby("MONTH")
         .size()
         .reset_index(name="collision_count")
-        .sort_values(["collision_count", "OCC_MONTH"], ascending=[False, True])
+        .rename(columns={"MONTH": "month"})
+        .sort_values("month")
         .reset_index(drop=True)
     )
 
+    result["month_name"] = result["month"].map(month_lookup)
+    result["month_name"] = pd.Categorical(
+        result["month_name"],
+        categories=[
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December",
+        ],
+        ordered=True,
+    )
+
+    end_log()
     return result
 
 def road_user_analysis(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Analyze collisions by road user type.
+    end_log = log_timed_block("road_user_analysis")
 
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        Collision dataset
-
-    Returns
-    -------
-    pandas.DataFrame
-        Summary table of collisions by road user type
-    """
-
-    if "INVTYPE" not in df.columns:
-        raise ValueError("Dataset must contain INVTYPE column")
-
-    # Handle missing values
-    df["INVTYPE"] = df["INVTYPE"].fillna("Unknown")
-
-    # Count collisions by road user type
-    summary = (
-        df.groupby("INVTYPE")
-        .size()
-        .reset_index(name="collision_count")
-        .sort_values("collision_count", ascending=False)
+    result = pd.DataFrame(
+        {
+            "road_user_type": ["Pedestrian", "Bicycle", "Motorcycle"],
+            "collision_count": [
+                int(df["PEDESTRIAN"].eq("YES").sum()) if "PEDESTRIAN" in df.columns else 0,
+                int(df["BICYCLE"].eq("YES").sum()) if "BICYCLE" in df.columns else 0,
+                int(df["MOTORCYCLE"].eq("YES").sum()) if "MOTORCYCLE" in df.columns else 0,
+            ],
+        }
     )
 
-    return summary
+    end_log()
+    return result
+
+
+def severity_trend_over_time(df: pd.DataFrame, selected_severity: str) -> pd.DataFrame:
+    end_log = log_timed_block("severity_trend_over_time")
+
+    if "OCC_DATE" not in df.columns or "severity_class" not in df.columns:
+        end_log()
+        return pd.DataFrame(columns=["date", "severity_type", "value"])
+
+    result = df.copy()
+    result["OCC_DATE"] = pd.to_datetime(result["OCC_DATE"], errors="coerce")
+    result = result.dropna(subset=["OCC_DATE"])
+
+    if result.empty:
+        end_log()
+        return pd.DataFrame(columns=["date", "severity_type", "value"])
+
+    severity_order = ["Fatal", "Injury", "Property Damage"]
+
+    if selected_severity == "All Severities":
+        result = result[result["severity_class"].isin(severity_order)].copy()
+    elif selected_severity in severity_order:
+        result = result[result["severity_class"] == selected_severity].copy()
+    else:
+        end_log()
+        return pd.DataFrame(columns=["date", "severity_type", "value"])
+
+    if result.empty:
+        end_log()
+        return pd.DataFrame(columns=["date", "severity_type", "value"])
+
+    trend_df = (
+        result.groupby([result["OCC_DATE"].dt.date, "severity_class"])
+        .size()
+        .reset_index(name="value")
+        .rename(columns={"OCC_DATE": "date", "severity_class": "severity_type"})
+    )
+
+    trend_df["date"] = pd.to_datetime(trend_df["date"])
+    trend_df = trend_df.sort_values(["date", "severity_type"]).reset_index(drop=True)
+
+    end_log()
+    return trend_df
+
+def total_collisions_trend_over_time(df: pd.DataFrame) -> pd.DataFrame:
+    end_log = log_timed_block("total_collisions_trend_over_time")
+
+    if "OCC_DATE" not in df.columns:
+        end_log()
+        return pd.DataFrame(columns=["date", "value"])
+
+    result = df.copy()
+    result["OCC_DATE"] = pd.to_datetime(result["OCC_DATE"], errors="coerce")
+    result = result.dropna(subset=["OCC_DATE"])
+
+    if result.empty:
+        end_log()
+        return pd.DataFrame(columns=["date", "value"])
+
+    trend_df = (
+        result.groupby(result["OCC_DATE"].dt.date)
+        .size()
+        .reset_index(name="value")
+        .rename(columns={"OCC_DATE": "date"})
+    )
+
+    trend_df["date"] = pd.to_datetime(trend_df["date"])
+    trend_df = trend_df.sort_values("date").reset_index(drop=True)
+
+    end_log()
+    return trend_df
+
+
+def forecast_collision_trend(
+    trend_df: pd.DataFrame,
+    horizon_days: int = 30,
+) -> pd.DataFrame:
+    end_log = log_timed_block("forecast_collision_trend")
+
+    if trend_df.empty or len(trend_df) < 30:
+        end_log()
+        return pd.DataFrame(columns=["date", "value", "series_type"])
+
+    data = trend_df.copy()
+    data = data.sort_values("date").reset_index(drop=True)
+    data = data.set_index("date").asfreq("D")
+    data["value"] = data["value"].fillna(0)
+
+    if len(data) < 30:
+        end_log()
+        return pd.DataFrame(columns=["date", "value", "series_type"])
+
+    try:
+        model = ExponentialSmoothing(
+            data["value"],
+            trend="add",
+            seasonal=None,
+            initialization_method="estimated",
+        )
+        fitted = model.fit(optimized=True)
+        forecast_values = fitted.forecast(horizon_days)
+    except Exception:
+        end_log()
+        return pd.DataFrame(columns=["date", "value", "series_type"])
+
+    forecast_df = forecast_values.reset_index()
+    forecast_df.columns = ["date", "value"]
+    forecast_df["series_type"] = "Forecast"
+
+    end_log()
+    return forecast_df
