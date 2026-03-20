@@ -1,6 +1,6 @@
 ## Repository Statistics
 
-**Total Commits:** 44  
+**Total Commits:** 97  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -8,38 +8,38 @@
 
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
-| Hilfritz Camallere | `hilfritz` | 33 | 9 | 43 | 2710 | 196 | Active contributor |
-| Ananya Mandal | `AnanyaMandal-DataAnalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
-| Daniyal Khan | `daniyalnkh` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
-| Joseph Jamoralin | `Joseph-dataanalyst` | 0 | 0 | 0 | 0 | 0 | No contributions yet |
+| Hilfritz Camallere | `hilfritz` | 53 | 12 | 66 | 4497 | 339 | Active contributor |
+| Ananya Mandal | `AnanyaMandal-DataAnalyst` | 12 | 4 | 14 | 376 | 112 | Active contributor |
+| Daniyal Khan | `daniyalnkh` | 0 | 2 | 0 | 0 | 0 | Active contributor |
+| Joseph Jamoralin | `Joseph-dataanalyst` | 5 | 2 | 6 | 122 | 10 | Active contributor |
 
 ### Contributor Statistics
 
 | Contributor | Commits | Files Changed | Insertions | Deletions |
 |-------------|---------|---------------|------------|-----------|
-| Hilfritz Camallere | 33 | 43 | 2710 | 196 |
-| Ananya Mandal | 0 | 0 | 0 | 0 |
+| Hilfritz Camallere | 53 | 66 | 4497 | 339 |
+| Ananya Mandal | 12 | 14 | 376 | 112 |
+| Joseph Jamoralin | 5 | 6 | 122 | 10 |
 | Daniyal Khan | 0 | 0 | 0 | 0 |
-| Joseph Jamoralin | 0 | 0 | 0 | 0 |
 
 ### Commit Type Distribution
 
 | Type | Count |
 |------|------:|
-| docs | 16 |
-| feat | 3 |
-| fix | 4 |
-| other | 15 |
-| refactor | 4 |
-| test | 2 |
+| docs | 35 |
+| feat | 6 |
+| fix | 6 |
+| other | 39 |
+| refactor | 7 |
+| test | 4 |
 
 ### File Metrics
 
 | Metric | Value |
 |--------|------:|
-| Python Files | 12 |
-| Source Files | 6 |
-| Test Files | 4 |
+| Python Files | 24 |
+| Source Files | 13 |
+| Test Files | 9 |
 | Markdown Files | 2 |
 
 ### Branch List
@@ -48,12 +48,23 @@
 
 ### Pull Request Statistics
 
-**Total Pull Requests:** 9  
-**Merged Pull Requests:** 9  
-**Open Pull Requests:** 0
+**Total Pull Requests:** 20  
+**Merged Pull Requests:** 16  
+**Open Pull Requests:** 3
 
 | PR # | Title | State | Author |
 |------|-------|-------|--------|
+| 20 | feat(US-06): Day-of-Week and Monthly Analysis with TDD + Refactor | OPEN | daniyalnkh |
+| 19 | feat(US-12): add day-of-week and monthly analysis to dashboard | OPEN | daniyalnkh |
+| 18 | Tdd filtering | OPEN | AnanyaMandal-DataAnalyst |
+| 17 | US-09: Automated Tests | MERGED | Joseph-dataanalyst |
+| 16 | road_user_analysis | CLOSED | AnanyaMandal-DataAnalyst |
+| 15 | US-12: Interactive Collision Analytics Dashboard | MERGED | hilfritz |
+| 14 | US-10: Feature Collision Severity Analysis | MERGED | Joseph-dataanalyst |
+| 13 | US - 11 road user analysis | MERGED | AnanyaMandal-DataAnalyst |
+| 12 | US-07: Add collision analysis by neighbourhood | MERGED | hilfritz |
+| 11 | US-08-Generating charts to interpret patterns | MERGED | AnanyaMandal-DataAnalyst |
+| 10 | US-06: Add collision analysis by hour | MERGED | hilfritz |
 | 9 | US-01: Fix CI workflow for repository statistics generation | MERGED | hilfritz |
 | 8 | US-01: Fix repository statistics workflow history depth | MERGED | hilfritz |
 | 7 | US-01: Fix team mapping in repository statistics generation | MERGED | hilfritz |
