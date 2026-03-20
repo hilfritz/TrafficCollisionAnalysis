@@ -224,6 +224,41 @@ def export_results(df: pd.DataFrame, output_path: str) -> str:
 
     return output_path
 
+def collisions_by_day_of_week(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Aggregate collisions by day of week to identify high-risk days.
+    """
+    _require_columns(df, ["OCC_DOW"])
+
+    result = (
+        df.dropna(subset=["OCC_DOW"])
+        .groupby("OCC_DOW")
+        .size()
+        .reset_index(name="collision_count")
+        .sort_values(["collision_count", "OCC_DOW"], ascending=[False, True])
+        .reset_index(drop=True)
+    )
+
+    return result
+
+
+def collisions_by_month(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Aggregate collisions by month to identify seasonal patterns.
+    """
+    _require_columns(df, ["OCC_MONTH"])
+
+    result = (
+        df.dropna(subset=["OCC_MONTH"])
+        .groupby("OCC_MONTH")
+        .size()
+        .reset_index(name="collision_count")
+        .sort_values(["collision_count", "OCC_MONTH"], ascending=[False, True])
+        .reset_index(drop=True)
+    )
+
+    return result
+
 def road_user_analysis(df: pd.DataFrame) -> pd.DataFrame:
     """
     Analyze collisions by road user type.

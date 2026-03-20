@@ -1,23 +1,19 @@
 # src/app.py
+from datetime import datetime
+from pathlib import Path
+from time import perf_counter
+
+import altair as alt
 import pandas as pd
 import pydeck as pdk
 import streamlit as st
-from pathlib import Path
-from time import perf_counter
-from datetime import datetime
 import streamlit.components.v1 as components
+
 from src.config import OUTPUT_DIR
+
 
 DEFAULT_PREPARED_DATASET_PATH = Path("data/processed/traffic_collisions_prepared.parquet")
 LOG_FILE = Path("logs/app_benchmark.log")
-
-import altair as alt
-severity_colors = {
-    "Fatal": "#dc3545",
-    "Injury": "#ff8c00",
-    "Property Damage": "#ffc107",
-    "Other": "#6c757d",
-}
 
 
 def reset_log():
@@ -68,12 +64,12 @@ def get_prepared_data(dataset_path: str):
     return df
 
 
-def apply_collision_severity_filter(df, severity: str):
+def apply_collision_severity_filter(df: pd.DataFrame, severity: str) -> pd.DataFrame:
     end_log = log_timed_block("apply_collision_severity_filter")
 
     result = df.copy()
 
-    if severity == "All":
+    if severity == "All Severities":
         end_log()
         return result
     if severity == "Fatal":
@@ -97,7 +93,7 @@ def apply_collision_severity_filter(df, severity: str):
     return result
 
 
-def apply_recent_days_filter(df, recent_days: int | None):
+def apply_recent_days_filter(df: pd.DataFrame, recent_days: int | None) -> pd.DataFrame:
     end_log = log_timed_block("apply_recent_days_filter")
     result = df.copy()
 
@@ -124,7 +120,7 @@ def filter_collisions_prepared(
     years: list[int] | None = None,
     divisions: list[str] | None = None,
     neighbourhoods: list[str] | None = None,
-):
+) -> pd.DataFrame:
     end_log = log_timed_block("filter_collisions_prepared")
     result = df.copy()
 
@@ -139,6 +135,38 @@ def filter_collisions_prepared(
 
     if neighbourhoods:
         result = result[result["NEIGHBOURHOOD_158"].isin(neighbourhoods)]
+
+    end_log()
+    return result
+
+
+def apply_road_user_filter(
+    df: pd.DataFrame,
+    pedestrian: bool = False,
+    bicycle: bool = False,
+    motorcycle: bool = False,
+) -> pd.DataFrame:
+    end_log = log_timed_block("apply_road_user_filter")
+
+    result = df.copy()
+    selected_conditions = []
+
+    if pedestrian and "PEDESTRIAN" in result.columns:
+        selected_conditions.append(result["PEDESTRIAN"].eq("YES"))
+    if bicycle and "BICYCLE" in result.columns:
+        selected_conditions.append(result["BICYCLE"].eq("YES"))
+    if motorcycle and "MOTORCYCLE" in result.columns:
+        selected_conditions.append(result["MOTORCYCLE"].eq("YES"))
+
+    if not selected_conditions:
+        end_log()
+        return result
+
+    combined_condition = selected_conditions[0]
+    for cond in selected_conditions[1:]:
+        combined_condition = combined_condition | cond
+
+    result = result[combined_condition].copy()
 
     end_log()
     return result
@@ -181,6 +209,108 @@ def collisions_by_neighbourhood(df: pd.DataFrame, top_n: int = 10) -> pd.DataFra
     return result
 
 
+def collisions_by_division(df: pd.DataFrame, top_n: int = 10) -> pd.DataFrame:
+    end_log = log_timed_block("collisions_by_division")
+    if "DIVISION" not in df.columns:
+        end_log()
+        return pd.DataFrame(columns=["DIVISION", "collision_count"])
+
+    result = (
+        df.dropna(subset=["DIVISION"])
+        .groupby("DIVISION")
+        .size()
+        .reset_index(name="collision_count")
+        .sort_values("collision_count", ascending=False)
+        .head(top_n)
+        .reset_index(drop=True)
+    )
+    end_log()
+    return result
+
+def collisions_by_day_of_week(df: pd.DataFrame) -> pd.DataFrame:
+    end_log = log_timed_block("collisions_by_day_of_week")
+
+    if "OCC_DOW" not in df.columns:
+        end_log()
+        return pd.DataFrame(columns=["day_of_week", "collision_count"])
+
+    order = [
+        "Monday", "Tuesday", "Wednesday", "Thursday",
+        "Friday", "Saturday", "Sunday"
+    ]
+
+    result = (
+        df.dropna(subset=["OCC_DOW"])
+        .groupby("OCC_DOW")
+        .size()
+        .reset_index(name="collision_count")
+        .rename(columns={"OCC_DOW": "day_of_week"})
+    )
+
+    result["day_of_week"] = pd.Categorical(
+        result["day_of_week"],
+        categories=order,
+        ordered=True,
+    )
+    result = result.sort_values("day_of_week").reset_index(drop=True)
+
+    end_log()
+    return result
+
+def collisions_by_month(df: pd.DataFrame) -> pd.DataFrame:
+    end_log = log_timed_block("collisions_by_month")
+
+    if "MONTH" not in df.columns:
+        end_log()
+        return pd.DataFrame(columns=["month_name", "collision_count"])
+
+    month_lookup = {
+        1: "January",
+        2: "February",
+        3: "March",
+        4: "April",
+        5: "May",
+        6: "June",
+        7: "July",
+        8: "August",
+        9: "September",
+        10: "October",
+        11: "November",
+        12: "December",
+    }
+
+    result = df.copy()
+    result["MONTH"] = pd.to_numeric(result["MONTH"], errors="coerce")
+    result = result.dropna(subset=["MONTH"])
+
+    if result.empty:
+        end_log()
+        return pd.DataFrame(columns=["month_name", "collision_count"])
+
+    result["MONTH"] = result["MONTH"].astype(int)
+
+    result = (
+        result.groupby("MONTH")
+        .size()
+        .reset_index(name="collision_count")
+        .rename(columns={"MONTH": "month"})
+        .sort_values("month")
+        .reset_index(drop=True)
+    )
+
+    result["month_name"] = result["month"].map(month_lookup)
+    result["month_name"] = pd.Categorical(
+        result["month_name"],
+        categories=[
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December",
+        ],
+        ordered=True,
+    )
+
+    end_log()
+    return result
+
 def collision_severity_analysis(df: pd.DataFrame) -> pd.DataFrame:
     end_log = log_timed_block("collision_severity_analysis")
 
@@ -190,11 +320,7 @@ def collision_severity_analysis(df: pd.DataFrame) -> pd.DataFrame:
 
     result = pd.DataFrame(
         {
-            "severity_type": [
-                "Fatal",
-                "Injury",
-                "Property Damage",
-            ],
+            "severity_type": ["Fatal", "Injury", "Property Damage"],
             "value": [
                 int((df["severity_class"] == "Fatal").sum()),
                 int((df["severity_class"] == "Injury").sum()),
@@ -225,12 +351,12 @@ def road_user_analysis(df: pd.DataFrame) -> pd.DataFrame:
     return result
 
 
-def collisions_trend_over_time(df: pd.DataFrame) -> pd.DataFrame:
-    end_log = log_timed_block("collisions_trend_over_time")
+def severity_trend_over_time(df: pd.DataFrame, selected_severity: str) -> pd.DataFrame:
+    end_log = log_timed_block("severity_trend_over_time")
 
-    if "OCC_DATE" not in df.columns:
+    if "OCC_DATE" not in df.columns or "severity_class" not in df.columns:
         end_log()
-        return pd.DataFrame(columns=["date", "collision_count"])
+        return pd.DataFrame(columns=["date", "severity_type", "value"])
 
     result = df.copy()
     result["OCC_DATE"] = pd.to_datetime(result["OCC_DATE"], errors="coerce")
@@ -238,16 +364,31 @@ def collisions_trend_over_time(df: pd.DataFrame) -> pd.DataFrame:
 
     if result.empty:
         end_log()
-        return pd.DataFrame(columns=["date", "collision_count"])
+        return pd.DataFrame(columns=["date", "severity_type", "value"])
+
+    severity_order = ["Fatal", "Injury", "Property Damage"]
+
+    if selected_severity == "All Severities":
+        result = result[result["severity_class"].isin(severity_order)].copy()
+    elif selected_severity in severity_order:
+        result = result[result["severity_class"] == selected_severity].copy()
+    else:
+        end_log()
+        return pd.DataFrame(columns=["date", "severity_type", "value"])
+
+    if result.empty:
+        end_log()
+        return pd.DataFrame(columns=["date", "severity_type", "value"])
 
     trend_df = (
-        result.groupby(result["OCC_DATE"].dt.date)
+        result.groupby([result["OCC_DATE"].dt.date, "severity_class"])
         .size()
-        .reset_index(name="collision_count")
-        .rename(columns={"OCC_DATE": "date"})
+        .reset_index(name="value")
+        .rename(columns={"OCC_DATE": "date", "severity_class": "severity_type"})
     )
+
     trend_df["date"] = pd.to_datetime(trend_df["date"])
-    trend_df = trend_df.sort_values("date").reset_index(drop=True)
+    trend_df = trend_df.sort_values(["date", "severity_type"]).reset_index(drop=True)
 
     end_log()
     return trend_df
@@ -312,115 +453,90 @@ def get_severity_color_map() -> dict[str, list[int]]:
     end_log()
     return result
 
-def severity_trend_over_time(df: pd.DataFrame, selected_severity: str) -> pd.DataFrame:
-    end_log = log_timed_block("severity_trend_over_time")
-
-    if "OCC_DATE" not in df.columns or "severity_class" not in df.columns:
-        end_log()
-        return pd.DataFrame(columns=["date", "severity_type", "value"])
-
-    result = df.copy()
-    result["OCC_DATE"] = pd.to_datetime(result["OCC_DATE"], errors="coerce")
-    result = result.dropna(subset=["OCC_DATE"])
-
-    if result.empty:
-        end_log()
-        return pd.DataFrame(columns=["date", "severity_type", "value"])
-
-    severity_order = ["Fatal", "Injury", "Property Damage"]
-
-    if selected_severity == "All":
-        result = result[result["severity_class"].isin(severity_order)].copy()
-    elif selected_severity in severity_order:
-        result = result[result["severity_class"] == selected_severity].copy()
-    else:
-        end_log()
-        return pd.DataFrame(columns=["date", "severity_type", "value"])
-
-    if result.empty:
-        end_log()
-        return pd.DataFrame(columns=["date", "severity_type", "value"])
-
-    trend_df = (
-        result.groupby([result["OCC_DATE"].dt.date, "severity_class"])
-        .size()
-        .reset_index(name="value")
-        .rename(columns={"OCC_DATE": "date", "severity_class": "severity_type"})
-    )
-
-    trend_df["date"] = pd.to_datetime(trend_df["date"])
-    trend_df = trend_df.sort_values(["date", "severity_type"]).reset_index(drop=True)
-
-    end_log()
-    return trend_df
 
 def render_map_legend():
     end_log = log_timed_block("render_map_legend")
     components.html(
         """
-    <div style="padding:5px 5px; border:1px solid #ddd; border-radius:8px; background-color:#fafafa; margin-top:8px;">
-    
-
-    <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
-        <b>Legend</b>    
-        <div style="display:flex; align-items:center; gap:6px;">
-            <div style="width:14px; height:14px; border-radius:50%; background:#dc3545;"></div>
-            <span>Fatal</span>
+        <div style="padding:5px 5px; border:1px solid #ddd; border-radius:8px; background-color:#fafafa; margin-top:8px;">
+            <b>Legend</b><br><br>
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <div style="width:14px; height:14px; border-radius:50%; background:#dc3545;"></div>
+                    <span>Fatal</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <div style="width:14px; height:14px; border-radius:50%; background:#ff8c00;"></div>
+                    <span>Injury</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <div style="width:14px; height:14px; border-radius:50%; background:#ffc107;"></div>
+                    <span>Property Damage</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <div style="width:14px; height:14px; border-radius:50%; background:#6c757d;"></div>
+                    <span>Other</span>
+                </div>
+            </div>
         </div>
-
-        <div style="display:flex; align-items:center; gap:6px;">
-            <div style="width:14px; height:14px; border-radius:50%; background:#ff8c00;"></div>
-            <span>Injury</span>
-        </div>
-
-        <div style="display:flex; align-items:center; gap:6px;">
-            <div style="width:14px; height:14px; border-radius:50%; background:#ffc107;"></div>
-            <span>Property Damage</span>
-        </div>
-
-        <div style="display:flex; align-items:center; gap:6px;">
-            <div style="width:14px; height:14px; border-radius:50%; background:#6c757d;"></div>
-            <span>Other</span>
-        </div>
-
-    </div>
-</div>
         """,
-        height=150,
+        height=95,
     )
     end_log()
 
 
-def build_map(filtered_df, map_mode: str, map_style_option: str):
+def build_map(filtered_df: pd.DataFrame, map_mode: str, map_style_option: str):
     end_build_map = log_timed_block("build_map")
     log_message(f"MAP VIEW selected: {map_mode}")
 
     map_df = build_severity_map_dataframe(filtered_df)
-    #st.write(map_df["severity_class"].value_counts())
 
     if map_df.empty:
         end_build_map()
         return None, "No valid coordinates available for the current filter selection."
 
+    # Preserve all fatal points, sample the rest if needed
     end_sample = log_timed_block("build_map.sample_limit")
     if len(map_df) > 6000:
-        map_df = map_df.sample(6000, random_state=42)
+        fatal_df = map_df[map_df["severity_class"] == "Fatal"]
+        non_fatal_df = map_df[map_df["severity_class"] != "Fatal"]
+
+        remaining = max(6000 - len(fatal_df), 0)
+        if len(non_fatal_df) > remaining:
+            non_fatal_df = non_fatal_df.sample(remaining, random_state=42)
+
+        map_df = pd.concat([fatal_df, non_fatal_df], ignore_index=True)
     end_sample()
 
     end_center = log_timed_block("build_map.compute_center")
     center_lat = map_df["LAT_WGS84"].mean()
     center_lon = map_df["LONG_WGS84"].mean()
+
+    lat_range = map_df["LAT_WGS84"].max() - map_df["LAT_WGS84"].min()
+    lon_range = map_df["LONG_WGS84"].max() - map_df["LONG_WGS84"].min()
+    spread = max(lat_range, lon_range)
+
+    if spread < 0.01:
+        zoom = 14
+    elif spread < 0.05:
+        zoom = 13
+    elif spread < 0.1:
+        zoom = 12
+    elif spread < 0.5:
+        zoom = 11
+    else:
+        zoom = 10
     end_center()
 
     color_map = get_severity_color_map()
     layers = []
 
-    if map_mode == "Point Map":
+    if map_mode == "Severity Point Map":
         end_mode = log_timed_block("build_map.point_layers")
         severity_draw_order = ["Other", "Property Damage", "Injury", "Fatal"]
+
         for severity in severity_draw_order:
             color = color_map[severity]
-        #for severity, color in color_map.items():
             subset = map_df[map_df["severity_class"] == severity].copy()
             if subset.empty:
                 continue
@@ -448,7 +564,7 @@ def build_map(filtered_df, map_mode: str, map_style_option: str):
             )
         end_mode()
 
-    elif map_mode == "Heatmap":
+    elif map_mode == "Severity Heatmap":
         end_mode = log_timed_block("build_map.heatmap_layers")
         for severity in ["Fatal", "Injury", "Property Damage"]:
             subset = map_df[map_df["severity_class"] == severity].copy()
@@ -466,7 +582,7 @@ def build_map(filtered_df, map_mode: str, map_style_option: str):
             )
         end_mode()
 
-    elif map_mode == "Cluster Bubbles":
+    elif map_mode == "Severity Cluster Bubbles":
         cluster_df = build_cluster_dataframe(map_df)
 
         if cluster_df.empty:
@@ -474,7 +590,10 @@ def build_map(filtered_df, map_mode: str, map_style_option: str):
             return None, "No cluster data available for the current filter selection."
 
         end_mode = log_timed_block("build_map.cluster_layers")
-        for severity, color in color_map.items():
+        severity_draw_order = ["Other", "Property Damage", "Injury", "Fatal"]
+
+        for severity in severity_draw_order:
+            color = color_map[severity]
             subset = cluster_df[cluster_df["severity_class"] == severity].copy()
             if subset.empty:
                 continue
@@ -529,7 +648,7 @@ def build_map(filtered_df, map_mode: str, map_style_option: str):
         },
     }
 
-    if map_mode == "Cluster Bubbles":
+    if map_mode == "Severity Cluster Bubbles":
         tooltip = {
             "html": """
                 <b>Severity:</b> {severity_class} <br/>
@@ -544,37 +663,14 @@ def build_map(filtered_df, map_mode: str, map_style_option: str):
     end_tooltip()
 
     end_deck = log_timed_block("build_map.deck")
-    lat_range = map_df["LAT_WGS84"].max() - map_df["LAT_WGS84"].min()
-    lon_range = map_df["LONG_WGS84"].max() - map_df["LONG_WGS84"].min()
-    spread = max(lat_range, lon_range)
-
-    if spread < 0.01:
-        zoom = 14
-    elif spread < 0.05:
-        zoom = 13
-    elif spread < 0.1:
-        zoom = 12
-    elif spread < 0.5:
-        zoom = 11
-    else:
-        zoom = 10
-
-    
     deck = pdk.Deck(
         layers=layers,
-        # initial_view_state=pdk.ViewState(
-        #     latitude=center_lat,
-        #     longitude=center_lon,
-        #     zoom=10,
-        #     pitch=0,
-        # ),
         initial_view_state=pdk.ViewState(
             latitude=center_lat,
             longitude=center_lon,
             zoom=zoom,
             pitch=0,
-            ),
-        
+        ),
         tooltip=tooltip,
         map_style=map_style_option,
     )
@@ -590,36 +686,6 @@ def export_results(df: pd.DataFrame, output_path: str) -> str:
     end_log()
     return output_path
 
-def apply_road_user_filter(
-    df,
-    pedestrian: bool = False,
-    bicycle: bool = False,
-    motorcycle: bool = False,
-):
-    end_log = log_timed_block("apply_road_user_filter")
-
-    result = df.copy()
-    selected_conditions = []
-
-    if pedestrian and "PEDESTRIAN" in result.columns:
-        selected_conditions.append(result["PEDESTRIAN"].eq("YES"))
-    if bicycle and "BICYCLE" in result.columns:
-        selected_conditions.append(result["BICYCLE"].eq("YES"))
-    if motorcycle and "MOTORCYCLE" in result.columns:
-        selected_conditions.append(result["MOTORCYCLE"].eq("YES"))
-
-    if not selected_conditions:
-        end_log()
-        return result
-
-    combined_condition = selected_conditions[0]
-    for cond in selected_conditions[1:]:
-        combined_condition = combined_condition | cond
-
-    result = result[combined_condition].copy()
-
-    end_log()
-    return result
 
 def main() -> None:
     reset_log()
@@ -627,14 +693,17 @@ def main() -> None:
 
     total_end = log_timed_block("main_total_runtime")
 
-    st.set_page_config(page_title="Toronto Collision Analysis", layout="wide")
+    st.set_page_config(page_title="Toronto Collision Risk Dashboard", layout="wide")
 
-    st.title("Toronto Collision Analysis")
-    #st.caption(
-    #    "Executive view of collision volume, severity, road-user exposure, and spatial risk patterns."
-    #)
+    st.title("Toronto Collision Risk Dashboard")
+    st.caption(
+        "Executive view of collision volume, severity, road-user exposure, and spatial risk patterns."
+    )
 
-    dataset_path = st.sidebar.text_input("Prepared dataset path", str(DEFAULT_PREPARED_DATASET_PATH))
+    dataset_path = st.sidebar.text_input(
+        "Prepared dataset path",
+        str(DEFAULT_PREPARED_DATASET_PATH),
+    )
 
     try:
         df = benchmark_call(timings, "get_prepared_data", get_prepared_data, dataset_path)
@@ -644,13 +713,11 @@ def main() -> None:
 
     st.sidebar.header("Filters")
 
-    # =========================
-    # 1. TIME WINDOW (FIRST)
-    # =========================
+    # 1. Time Window
     recent_days_option = st.sidebar.selectbox(
         "Time Window",
         ["All Time", "30 Days", "60 Days", "90 Days", "180 Days", "365 Days"],
-        index=3,  # default 90 days
+        index=3,
     )
     log_message(f"TREND WINDOW selected: {recent_days_option}")
 
@@ -664,9 +731,7 @@ def main() -> None:
     }
     recent_days = recent_days_lookup[recent_days_option]
 
-    # =========================
-    # 2. YEAR (SECOND)
-    # =========================
+    # 2. Year
     end_years = log_timed_block("sidebar.years")
     years = (
         sorted([int(y) for y in df["YEAR"].dropna().unique().tolist()])
@@ -674,17 +739,10 @@ def main() -> None:
         else []
     )
     default_year = [max(years)] if years else []
-
-    selected_years = st.sidebar.multiselect(
-        "Year",
-        years,
-        default=default_year,
-    )
+    selected_years = st.sidebar.multiselect("Year", years, default=default_year)
     end_years()
 
-    # =========================
-    # 3. DIVISION
-    # =========================
+    # 3. Division
     end_divisions = log_timed_block("sidebar.divisions")
     divisions = (
         sorted(df["DIVISION"].dropna().astype(str).unique().tolist())
@@ -694,9 +752,7 @@ def main() -> None:
     selected_divisions = st.sidebar.multiselect("Division", divisions)
     end_divisions()
 
-    # =========================
-    # 4. NEIGHBOURHOOD
-    # =========================
+    # 4. Neighbourhood
     end_neigh = log_timed_block("sidebar.neighbourhoods")
     neighbourhoods = (
         sorted(df["NEIGHBOURHOOD_158"].dropna().astype(str).unique().tolist())
@@ -706,26 +762,19 @@ def main() -> None:
     selected_neighbourhoods = st.sidebar.multiselect("Neighbourhood", neighbourhoods)
     end_neigh()
 
-    # =========================
-    # 5. COLLISION SEVERITY
-    # =========================
+    # 5. Severity
     collision_severity = st.sidebar.selectbox(
         "Collision Severity",
-        [
-            "All",
-            "Fatal",
-            "Injury",
-            "Property Damage",
-            "Other",
-        ],
+        ["All Severities", "Fatal", "Injury", "Property Damage", "Other"],
     )
     log_message(f"COLLISION SEVERITY selected: {collision_severity}")
 
-    # =========================
-    # 6. ROAD USER
-    # =========================
-    st.sidebar.markdown("Involved Road User")
+    # Top N control
+    top_n_option = st.sidebar.selectbox("Top N", [5, 10, 15], index=1)
+    log_message(f"TOP N selected: {top_n_option}")
 
+    # 6. Road User
+    st.sidebar.markdown("**Road User Involvement**")
     filter_pedestrian = st.sidebar.checkbox("Pedestrian")
     filter_bicycle = st.sidebar.checkbox("Bicycle")
     filter_motorcycle = st.sidebar.checkbox("Motorcycle")
@@ -737,18 +786,14 @@ def main() -> None:
     }
     log_message(f"ROAD USER FILTERS selected: {selected_road_users}")
 
-    # =========================
-    # 7. MAP VIEW
-    # =========================
+    # 7. Map View
     map_mode = st.sidebar.radio(
         "Map View",
-        ["Point Map", "Heatmap", "Cluster Bubbles"],
+        ["Severity Point Map", "Severity Heatmap", "Severity Cluster Bubbles"],
     )
     log_message(f"MAP MODE selected in sidebar: {map_mode}")
 
-    # =========================
-    # 8. MAP STYLE
-    # =========================
+    # 8. Map Style
     map_style_display = st.sidebar.selectbox(
         "Map Style",
         ["Light", "Road", "Dark"],
@@ -762,44 +807,6 @@ def main() -> None:
         "Dark": "dark",
     }
     map_style_option = map_style_lookup[map_style_display]
-
-    # =========================
-    # FILTER PIPELINE (unchanged)
-    # =========================
-    filtered_df = benchmark_call(
-        timings,
-        "filter_collisions_prepared",
-        filter_collisions_prepared,
-        df,
-        years=selected_years or None,
-        divisions=selected_divisions or None,
-        neighbourhoods=selected_neighbourhoods or None,
-    )
-    filtered_df = benchmark_call(
-        timings,
-        "apply_collision_severity_filter",
-        apply_collision_severity_filter,
-        filtered_df,
-        collision_severity,
-    )
-    filtered_df = benchmark_call(
-        timings,
-        "apply_road_user_filter",
-        apply_road_user_filter,
-        filtered_df,
-        pedestrian=filter_pedestrian,
-        bicycle=filter_bicycle,
-        motorcycle=filter_motorcycle,
-    )
-    filtered_df = benchmark_call(
-        timings,
-        "apply_recent_days_filter",
-        apply_recent_days_filter,
-        filtered_df,
-        recent_days,
-    )
-
-    # everything below stays the same
 
     filtered_df = benchmark_call(
         timings,
@@ -839,19 +846,28 @@ def main() -> None:
         if not filtered_df.empty
         else pd.DataFrame()
     )
-
     neighbourhood_df = (
         benchmark_call(
             timings,
             "collisions_by_neighbourhood",
             collisions_by_neighbourhood,
             filtered_df,
-            top_n=10,
+            top_n=top_n_option,
         )
         if not filtered_df.empty
         else pd.DataFrame()
     )
-
+    division_df = (
+        benchmark_call(
+            timings,
+            "collisions_by_division",
+            collisions_by_division,
+            filtered_df,
+            top_n=top_n_option,
+        )
+        if not filtered_df.empty
+        else pd.DataFrame()
+    )
     severity_df = (
         benchmark_call(
             timings,
@@ -862,7 +878,6 @@ def main() -> None:
         if not filtered_df.empty
         else pd.DataFrame()
     )
-
     road_users_df = (
         benchmark_call(
             timings,
@@ -873,7 +888,6 @@ def main() -> None:
         if not filtered_df.empty
         else pd.DataFrame()
     )
-
     trend_df = benchmark_call(
         timings,
         "severity_trend_over_time",
@@ -881,22 +895,91 @@ def main() -> None:
         filtered_df,
         collision_severity,
     )
+    day_of_week_df = (
+        benchmark_call(
+            timings,
+            "collisions_by_day_of_week",
+            collisions_by_day_of_week,
+            filtered_df,
+        )
+        if not filtered_df.empty
+        else pd.DataFrame()
+    )
+    month_df = (
+        benchmark_call(
+            timings,
+            "collisions_by_month",
+            collisions_by_month,
+            filtered_df,
+        )
+        if not filtered_df.empty
+        else pd.DataFrame()
+    )
 
     #st.subheader("Key Metrics")
-    kpi1, kpi2, kpi3, kpi4, kpi5 = st.columns(5)
+
+    # Row 1: core executive KPIs
+    kpi1, kpi2, kpi3, kpi4, kpi5, kpi6 = st.columns(6)
 
     total_collisions = len(filtered_df)
-    total_fatalities = int(filtered_df["HAS_FATALITY"].sum()) if "HAS_FATALITY" in filtered_df.columns else 0
-    total_injury_collisions = int((filtered_df["severity_class"] == "Injury").sum()) if "severity_class" in filtered_df.columns else 0
+    fatal_count = (
+        int((filtered_df["severity_class"] == "Fatal").sum())
+        if "severity_class" in filtered_df.columns
+        else 0
+    )
+    injury_count = (
+        int((filtered_df["severity_class"] == "Injury").sum())
+        if "severity_class" in filtered_df.columns
+        else 0
+    )
+    property_damage_count = (
+        int((filtered_df["severity_class"] == "Property Damage").sum())
+        if "severity_class" in filtered_df.columns
+        else 0
+    )
     peak_hour = int(hourly_df.iloc[0]["OCC_HOUR"]) if not hourly_df.empty else "-"
 
     kpi1.metric("Total Collisions", total_collisions)
-    kpi2.metric("Fatalities", total_fatalities)
-    kpi3.metric("Injury Collisions", total_injury_collisions)
-    kpi4.metric("Peak Hour", peak_hour)
-    kpi5.metric("Time Window", recent_days_option)
+    kpi2.metric("Fatal", fatal_count)
+    kpi3.metric("Injury", injury_count)
+    kpi4.metric("Property Damage", property_damage_count)
+    kpi5.metric("Peak Hour", peak_hour)
+    kpi6.metric("Time Window", recent_days_option)
 
-    # Row 1: full-width trend
+    # Row 2: road user exposure KPIs
+    st.subheader("Road Users Involved")
+    r1, r2, r3 = st.columns(3)
+
+    pedestrian_count = (
+        int(filtered_df["PEDESTRIAN"].eq("YES").sum())
+        if "PEDESTRIAN" in filtered_df.columns
+        else 0
+    )
+    bicycle_count = (
+        int(filtered_df["BICYCLE"].eq("YES").sum())
+        if "BICYCLE" in filtered_df.columns
+        else 0
+    )
+    motorcycle_count = (
+        int(filtered_df["MOTORCYCLE"].eq("YES").sum())
+        if "MOTORCYCLE" in filtered_df.columns
+        else 0
+    )
+
+    r1.metric("Pedestrian", pedestrian_count)
+    r2.metric("Bicycle", bicycle_count)
+    r3.metric("Motorcycle", motorcycle_count)
+
+
+
+    st.caption(
+        f"Filters applied — Year: {selected_years or 'Latest'} | "
+        f"Division: {selected_divisions or 'All'} | "
+        f"Neighbourhood: {selected_neighbourhoods or 'All'} | "
+        f"Severity: {collision_severity}"
+    )
+
+    # Row 1: Trend
     st.subheader("Collision Trend")
     if not trend_df.empty:
         end_chart = log_timed_block("st.altair_chart.trend")
@@ -924,15 +1007,16 @@ def main() -> None:
     else:
         st.info("No trend data available for the current filter selection.")
 
-    # Row 2: hourly distribution + top neighbourhoods
+    # Row 2: Hour + Neighbourhoods
     col1, col2 = st.columns(2, gap="large")
 
     with col1:
-        st.subheader("Collision Distribution by Hour")
+        st.subheader("Hourly Distribution")
         if not hourly_df.empty:
             end_bar = log_timed_block("st.bar_chart.hourly")
             st.bar_chart(
-                hourly_df.sort_values("OCC_HOUR").set_index("OCC_HOUR")["collision_count"]
+                hourly_df.sort_values("OCC_HOUR").set_index("OCC_HOUR")["collision_count"],
+                height=300,
             )
             end_bar()
         else:
@@ -942,66 +1026,49 @@ def main() -> None:
         st.subheader("Top High-Risk Neighbourhoods")
         if not neighbourhood_df.empty:
             end_df = log_timed_block("st.dataframe.neighbourhoods")
-            st.dataframe(neighbourhood_df, use_container_width=True, hide_index=True)
+            st.dataframe(neighbourhood_df, use_container_width=True, hide_index=True, height=280)
             end_df()
         else:
             st.info("No neighbourhood data available for the current filter selection.")
 
-    # Row 3: severity KPI cards + road exposure KPI cards
-    col3, col4 = st.columns(2, gap="large")
+    # Row 3: Day of Week + Month
+    # Row 3: Day of Week + Month + Top Divisions
+    col3, col4, col5 = st.columns(3, gap="large")
 
     with col3:
-        st.subheader("Severity Breakdown")
-        if not severity_df.empty:
-            fatal_value = int(
-                severity_df.loc[severity_df["severity_type"] == "Fatal", "value"].iloc[0]
-            )
-            injury_value = int(
-                severity_df.loc[severity_df["severity_type"] == "Injury", "value"].iloc[0]
-            )
-            property_damage_value = int(
-                severity_df.loc[
-                    severity_df["severity_type"] == "Property Damage", "value"
-                ].iloc[0]
-            )
-
-            s1, s2, s3 = st.columns(3)
-            s1.metric("Fatal", fatal_value)
-            s2.metric("Injury", injury_value)
-            s3.metric("Property Damage", property_damage_value)
-
-            end_df = log_timed_block("st.dataframe.severity")
-            st.dataframe(severity_df, use_container_width=True, hide_index=True)
-            end_df()
+        st.subheader("Week Day Distribution")
+        if not day_of_week_df.empty:
+            end_bar = log_timed_block("st.bar_chart.day_of_week")
+            st.bar_chart(day_of_week_df.set_index("day_of_week")["collision_count"])
+            end_bar()
         else:
-            st.info("No severity data available for the current filter selection.")
+            st.info("No day-of-week data available for the current filter selection.")
 
     with col4:
-        st.subheader("Road User Exposure")
-        if not road_users_df.empty:
-            pedestrian_value = int(
-                road_users_df.loc[road_users_df["road_user_type"] == "Pedestrian", "collision_count"].iloc[0]
-            )
-            bicycle_value = int(
-                road_users_df.loc[road_users_df["road_user_type"] == "Bicycle", "collision_count"].iloc[0]
-            )
-            motorcycle_value = int(
-                road_users_df.loc[road_users_df["road_user_type"] == "Motorcycle", "collision_count"].iloc[0]
-            )
+        st.subheader("Monthly Distribution")
+        if not month_df.empty:
+            end_bar = log_timed_block("st.bar_chart.month")
+            st.bar_chart(month_df.set_index("month_name")["collision_count"])
+            end_bar()
+        else:
+            st.info("No monthly data available for the current filter selection.")
 
-            r1, r2, r3 = st.columns(3)
-            r1.metric("Pedestrian", pedestrian_value)
-            r2.metric("Bicycle", bicycle_value)
-            r3.metric("Motorcycle", motorcycle_value)
-
-            end_df = log_timed_block("st.dataframe.road_users")
-            st.dataframe(road_users_df, use_container_width=True, hide_index=True)
+    with col5:
+        st.subheader("Top Divisions")
+        if not division_df.empty:
+            end_df = log_timed_block("st.dataframe.divisions")
+            st.dataframe(
+                division_df.head(5),
+                use_container_width=True,
+                hide_index=True,
+                height=260,
+            )
             end_df()
         else:
-            st.info("No road user data available for the current filter selection.")
-
-    # Row 4: full-width map
-    st.subheader("Map of Collisions")
+            st.info("No division data available for the current filter selection.")
+    
+    # Row 6: Map
+    st.subheader("Map View")
     deck, map_error = benchmark_call(
         timings,
         "build_map",
@@ -1019,10 +1086,10 @@ def main() -> None:
         end_pydeck()
         render_map_legend()
 
-    # Row 5: compact export + preview
-    col5, col6 = st.columns([1, 3], gap="large")
+    # Row 7: Export + Preview
+    col7, col8 = st.columns([1, 3], gap="large")
 
-    with col5:
+    with col7:
         st.subheader("Export")
 
         end_mkdir = log_timed_block("OUTPUT_DIR.mkdir")
@@ -1053,7 +1120,7 @@ def main() -> None:
         )
         end_download()
 
-    with col6:
+    with col8:
         st.subheader("Filtered Data Preview")
         end_df = log_timed_block("st.dataframe.preview")
         st.dataframe(filtered_df.head(5), use_container_width=True, hide_index=True)
@@ -1074,6 +1141,7 @@ def main() -> None:
     with st.expander("Benchmark Log File"):
         if LOG_FILE.exists():
             st.code(LOG_FILE.read_text(encoding="utf-8"), language="text")
+
 
 if __name__ == "__main__":
     main()
