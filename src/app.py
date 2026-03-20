@@ -2,7 +2,7 @@
 from datetime import datetime
 from pathlib import Path
 from time import perf_counter
-
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import altair as alt
 import pandas as pd
 import pydeck as pdk
@@ -396,6 +396,73 @@ def severity_trend_over_time(df: pd.DataFrame, selected_severity: str) -> pd.Dat
     end_log()
     return trend_df
 
+def total_collisions_trend_over_time(df: pd.DataFrame) -> pd.DataFrame:
+    end_log = log_timed_block("total_collisions_trend_over_time")
+
+    if "OCC_DATE" not in df.columns:
+        end_log()
+        return pd.DataFrame(columns=["date", "value"])
+
+    result = df.copy()
+    result["OCC_DATE"] = pd.to_datetime(result["OCC_DATE"], errors="coerce")
+    result = result.dropna(subset=["OCC_DATE"])
+
+    if result.empty:
+        end_log()
+        return pd.DataFrame(columns=["date", "value"])
+
+    trend_df = (
+        result.groupby(result["OCC_DATE"].dt.date)
+        .size()
+        .reset_index(name="value")
+        .rename(columns={"OCC_DATE": "date"})
+    )
+
+    trend_df["date"] = pd.to_datetime(trend_df["date"])
+    trend_df = trend_df.sort_values("date").reset_index(drop=True)
+
+    end_log()
+    return trend_df
+
+
+def forecast_collision_trend(
+    trend_df: pd.DataFrame,
+    horizon_days: int = 30,
+) -> pd.DataFrame:
+    end_log = log_timed_block("forecast_collision_trend")
+
+    if trend_df.empty or len(trend_df) < 30:
+        end_log()
+        return pd.DataFrame(columns=["date", "value", "series_type"])
+
+    data = trend_df.copy()
+    data = data.sort_values("date").reset_index(drop=True)
+    data = data.set_index("date").asfreq("D")
+    data["value"] = data["value"].fillna(0)
+
+    if len(data) < 30:
+        end_log()
+        return pd.DataFrame(columns=["date", "value", "series_type"])
+
+    try:
+        model = ExponentialSmoothing(
+            data["value"],
+            trend="add",
+            seasonal=None,
+            initialization_method="estimated",
+        )
+        fitted = model.fit(optimized=True)
+        forecast_values = fitted.forecast(horizon_days)
+    except Exception:
+        end_log()
+        return pd.DataFrame(columns=["date", "value", "series_type"])
+
+    forecast_df = forecast_values.reset_index()
+    forecast_df.columns = ["date", "value"]
+    forecast_df["series_type"] = "Forecast"
+
+    end_log()
+    return forecast_df
 
 def build_severity_map_dataframe(filtered_df: pd.DataFrame) -> pd.DataFrame:
     end_log = log_timed_block("build_severity_map_dataframe")
@@ -719,13 +786,48 @@ def main() -> None:
     # 1. Time Window
     recent_days_option = st.sidebar.selectbox(
         "Time Window",
-        ["All Time", "30 Days", "60 Days", "90 Days", "180 Days", "365 Days"],
-        index=3,
+        [
+            "All Time",
+            "7 Days",
+            "14 Days",
+            "30 Days",
+            "60 Days",
+            "90 Days",
+            "180 Days",
+            "365 Days",
+        ],
+        index=3,  # still default to 90 Days
     )
     log_message(f"TREND WINDOW selected: {recent_days_option}")
+    show_forecast = st.sidebar.checkbox("Show Forecast", value=True)
+    forecast_horizon_option = st.sidebar.selectbox(
+        "Forecast Horizon",
+        [
+            "7 Days",
+            "14 Days",
+            "30 Days",
+            "60 Days",
+            "90 Days",
+        ],
+        index=0,  # default still 7 Days
+    )
+
+    forecast_horizon_lookup = {
+        "7 Days": 7,
+        "14 Days": 14,
+        "30 Days": 30,
+        "60 Days": 60,
+        "90 Days": 90,
+    }
+
+    forecast_horizon = forecast_horizon_lookup[forecast_horizon_option]
+    log_message(f"SHOW FORECAST selected: {show_forecast}")
+    log_message(f"FORECAST HORIZON selected: {forecast_horizon}")
 
     recent_days_lookup = {
         "All Time": None,
+        "7 Days": 7,
+        "14 Days": 14,
         "30 Days": 30,
         "60 Days": 60,
         "90 Days": 90,
@@ -898,6 +1000,29 @@ def main() -> None:
         filtered_df,
         collision_severity,
     )
+    total_trend_df = benchmark_call(
+        timings,
+        "total_collisions_trend_over_time",
+        total_collisions_trend_over_time,
+        filtered_df,
+    )
+
+    forecast_df = (
+        benchmark_call(
+            timings,
+            "forecast_collision_trend",
+            forecast_collision_trend,
+            total_trend_df,
+            forecast_horizon,
+        )
+        if show_forecast
+        else pd.DataFrame(columns=["date", "value", "series_type"])
+    )
+    if show_forecast and not total_trend_df.empty:
+        if len(total_trend_df) < forecast_horizon:
+            st.warning(
+                "Forecast horizon is longer than available data. Results may be unreliable."
+            )
     day_of_week_df = (
         benchmark_call(
             timings,
@@ -979,37 +1104,132 @@ def main() -> None:
         f"Filters applied — Year: {selected_years or 'Latest'} | "
         f"Division: {selected_divisions or 'All'} | "
         f"Neighbourhood: {selected_neighbourhoods or 'All'} | "
-        f"Severity: {collision_severity}"
+        f"Severity: {collision_severity} | "
+        f"Window: {recent_days_option}"
     )
 
     # Row 1: Trend
-    st.subheader("Collision Trend")
-    if not trend_df.empty:
-        end_chart = log_timed_block("st.altair_chart.trend")
+    col_chart, col_legend = st.columns([4, 1], gap="large")
 
-        trend_chart = (
-            alt.Chart(trend_df)
-            .mark_line(point=True)
-            .encode(
-                x=alt.X("date:T", title="Date"),
-                y=alt.Y("value:Q", title="Collision Count"),
-                color=alt.Color(
-                    "severity_type:N",
-                    scale=alt.Scale(
-                        domain=["Fatal", "Injury", "Property Damage"],
-                        range=["#dc3545", "#ff8c00", "#ffc107"],
+    with col_chart:
+        st.subheader("Collision Trend")
+        #fritz
+        if not trend_df.empty:
+            end_chart = log_timed_block("st.altair_chart.trend")
+
+            charts = []
+
+            # 1. Existing severity trend (UNCHANGED)
+            severity_chart = (
+                alt.Chart(trend_df)
+                .mark_line(point=True)
+                .encode(
+                    x=alt.X("date:T", title="Date"),
+                    y=alt.Y("value:Q", title="Collision Count"),
+                    color=alt.Color(
+                        "severity_type:N",
+                        scale=alt.Scale(
+                            domain=["Fatal", "Injury", "Property Damage"],
+                            range=["#dc3545", "#ff8c00", "#ffc107"],
+                        ),
+                        legend=None,
                     ),
-                    legend=alt.Legend(title="Severity"),
-                ),
-                tooltip=["date:T", "severity_type:N", "value:Q"],
+                    tooltip=["date:T", "severity_type:N", "value:Q"],
+                )
             )
+            charts.append(severity_chart)
+
+            # 2. Total actual (BLUE solid)
+            if not total_trend_df.empty:
+                total_chart = (
+                    alt.Chart(total_trend_df)
+                    .mark_line(point=False, strokeWidth=3)
+                    .encode(
+                        x="date:T",
+                        y="value:Q",
+                        color=alt.value("#1f77b4"),
+                        tooltip=["date:T", "value:Q"],
+                    )
+                )
+                charts.append(total_chart)
+
+            # 3. Forecast (BLUE dashed)
+            if show_forecast and not forecast_df.empty:
+                forecast_chart = (
+                    alt.Chart(forecast_df)
+                    .mark_line(point=False, strokeDash=[6, 4], strokeWidth=3)
+                    .encode(
+                        x="date:T",
+                        y="value:Q",
+                        color=alt.value("#1f77b4"),
+                        tooltip=["date:T", "value:Q"],
+                    )
+                )
+                charts.append(forecast_chart)
+
+            st.altair_chart(alt.layer(*charts), use_container_width=True)
+            
+            end_chart()
+
+            # 👇 ADD THIS RIGHT HERE (after the chart)
+            st.caption(
+                "Solid lines = actual collisions | Dashed blue = forecast (total collisions only). "
+                "Severity-level forecasting is not shown due to variability in low-frequency events (e.g., fatal collisions)."
+            )
+
+            if show_forecast and forecast_df.empty:
+                st.info("Not enough data available to generate a forecast.")
+        else:
+            st.info("No trend data available for the current filter selection.")
+    with col_legend:
+        components.html(
+            """
+            <br><br>
+            <div style="font-family:sans-serif; font-size:14px; color:white; padding-top:8px;">
+
+                <div style="font-weight:600; margin-bottom:8px;">Actual</div>
+
+                <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="width:30px; border-top:3px solid #dc3545;"></div>
+                        <span>Fatal</span>
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="width:30px; border-top:3px solid #ff8c00;"></div>
+                        <span>Injury</span>
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="width:30px; border-top:3px solid #ffc107;"></div>
+                        <span>Property Damage</span>
+                    </div>
+
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="width:30px; border-top:3px solid #1f77b4;"></div>
+                        <span>Total Collisions</span>
+                    </div>
+                </div>
+
+                <div style="font-weight:600; margin-bottom:8px; margin-top:20px;">Forecast</div>
+
+                <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="width:30px; border-top:3px dashed #1f77b4;"></div>
+                        <span>Total (Forecast)</span>
+                    </div>
+                </div>
+
+                <!-- 👇 Explanation -->
+                <div style="font-size:14px; color:#cccccc; line-height:1.4; margin-top:20px;">
+                    Severity-level forecasting is not shown due to variability in low-frequency events (e.g., fatal collisions).
+                </div>
+
+            </div>
+            """,
+            height=380,
         )
-
-        st.altair_chart(trend_chart, use_container_width=True)
-        end_chart()
-    else:
-        st.info("No trend data available for the current filter selection.")
-
+    
     # Row 2: Hour + Neighbourhoods
     col1, col2 = st.columns(2, gap="large")
 
