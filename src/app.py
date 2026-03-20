@@ -7,6 +7,9 @@ from time import perf_counter
 from datetime import datetime
 import streamlit.components.v1 as components
 from src.config import OUTPUT_DIR
+from src.analytics import collisions_by_day_of_week, collisions_by_month
+
+# Dashboard with day-of-week and monthly analysis (US-12)
 
 DEFAULT_PREPARED_DATASET_PATH = Path("data/processed/traffic_collisions_prepared.parquet")
 LOG_FILE = Path("logs/app_benchmark.log")
