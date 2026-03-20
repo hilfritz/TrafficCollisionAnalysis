@@ -290,4 +290,3 @@ def road_user_analysis(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return summary
- main

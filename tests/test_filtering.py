@@ -1,5 +1,15 @@
 import pandas as pd
+from src.filtering import filter_by_neighbourhood
 from src.analytics import filter_collisions
+
+def test_filter_by_neighbourhood():
+    data = pd.DataFrame({
+        "Neighbourhood": ["A", "B", "A"]
+    })
+
+    result = filter_by_neighbourhood(data, "A")
+
+    assert len(result) == 2
 
 
 def test_filter_by_hour():
