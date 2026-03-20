@@ -453,13 +453,48 @@ def main() -> None:
     # 1. Time Window
     recent_days_option = st.sidebar.selectbox(
         "Time Window",
-        ["All Time", "30 Days", "60 Days", "90 Days", "180 Days", "365 Days"],
-        index=3,
+        [
+            "All Time",
+            "7 Days",
+            "14 Days",
+            "30 Days",
+            "60 Days",
+            "90 Days",
+            "180 Days",
+            "365 Days",
+        ],
+        index=3,  # still default to 90 Days
     )
     log_message(f"TREND WINDOW selected: {recent_days_option}")
+    show_forecast = st.sidebar.checkbox("Show Forecast", value=True)
+    forecast_horizon_option = st.sidebar.selectbox(
+        "Forecast Horizon",
+        [
+            "7 Days",
+            "14 Days",
+            "30 Days",
+            "60 Days",
+            "90 Days",
+        ],
+        index=0,  # default still 7 Days
+    )
+
+    forecast_horizon_lookup = {
+        "7 Days": 7,
+        "14 Days": 14,
+        "30 Days": 30,
+        "60 Days": 60,
+        "90 Days": 90,
+    }
+
+    forecast_horizon = forecast_horizon_lookup[forecast_horizon_option]
+    log_message(f"SHOW FORECAST selected: {show_forecast}")
+    log_message(f"FORECAST HORIZON selected: {forecast_horizon}")
 
     recent_days_lookup = {
         "All Time": None,
+        "7 Days": 7,
+        "14 Days": 14,
         "30 Days": 30,
         "60 Days": 60,
         "90 Days": 90,
@@ -632,6 +667,29 @@ def main() -> None:
         filtered_df,
         collision_severity,
     )
+    total_trend_df = benchmark_call(
+        timings,
+        "total_collisions_trend_over_time",
+        total_collisions_trend_over_time,
+        filtered_df,
+    )
+
+    forecast_df = (
+        benchmark_call(
+            timings,
+            "forecast_collision_trend",
+            forecast_collision_trend,
+            total_trend_df,
+            forecast_horizon,
+        )
+        if show_forecast
+        else pd.DataFrame(columns=["date", "value", "series_type"])
+    )
+    if show_forecast and not total_trend_df.empty:
+        if len(total_trend_df) < forecast_horizon:
+            st.warning(
+                "Forecast horizon is longer than available data. Results may be unreliable."
+            )
     day_of_week_df = (
         benchmark_call(
             timings,
@@ -713,29 +771,38 @@ def main() -> None:
         f"Filters applied — Year: {selected_years or 'Latest'} | "
         f"Division: {selected_divisions or 'All'} | "
         f"Neighbourhood: {selected_neighbourhoods or 'All'} | "
-        f"Severity: {collision_severity}"
+        f"Severity: {collision_severity} | "
+        f"Window: {recent_days_option}"
     )
 
     # Row 1: Trend
-    st.subheader("Collision Trend")
-    if not trend_df.empty:
-        end_chart = log_timed_block("st.altair_chart.trend")
+    col_chart, col_legend = st.columns([4, 1], gap="large")
 
-        trend_chart = (
-            alt.Chart(trend_df)
-            .mark_line(point=True)
-            .encode(
-                x=alt.X("date:T", title="Date"),
-                y=alt.Y("value:Q", title="Collision Count"),
-                color=alt.Color(
-                    "severity_type:N",
-                    scale=alt.Scale(
-                        domain=["Fatal", "Injury", "Property Damage"],
-                        range=["#dc3545", "#ff8c00", "#ffc107"],
+    with col_chart:
+        st.subheader("Collision Trend")
+        #fritz
+        if not trend_df.empty:
+            end_chart = log_timed_block("st.altair_chart.trend")
+
+            charts = []
+
+            # 1. Existing severity trend (UNCHANGED)
+            severity_chart = (
+                alt.Chart(trend_df)
+                .mark_line(point=True)
+                .encode(
+                    x=alt.X("date:T", title="Date"),
+                    y=alt.Y("value:Q", title="Collision Count"),
+                    color=alt.Color(
+                        "severity_type:N",
+                        scale=alt.Scale(
+                            domain=["Fatal", "Injury", "Property Damage"],
+                            range=["#dc3545", "#ff8c00", "#ffc107"],
+                        ),
+                        legend=None,
                     ),
-                    legend=alt.Legend(title="Severity"),
-                ),
-                tooltip=["date:T", "severity_type:N", "value:Q"],
+                    tooltip=["date:T", "severity_type:N", "value:Q"],
+                )
             )
             charts.append(severity_chart)
 
@@ -815,11 +882,16 @@ def main() -> None:
                     </div>
                 </div>
 
-        st.altair_chart(trend_chart, use_container_width=True)
-        end_chart()
-    else:
-        st.info("No trend data available for the current filter selection.")
+                <!-- 👇 Explanation -->
+                <div style="font-size:14px; color:#cccccc; line-height:1.4; margin-top:20px;">
+                    Severity-level forecasting is not shown due to variability in low-frequency events (e.g., fatal collisions).
+                </div>
 
+            </div>
+            """,
+            height=380,
+        )
+    
     # Row 2: Hour + Neighbourhoods
     col1, col2 = st.columns(2, gap="large")
 
