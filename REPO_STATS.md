@@ -1,6 +1,6 @@
 ## Repository Statistics
 
-**Total Commits:** 121  
+**Total Commits:** 128  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -8,37 +8,37 @@
 
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
-| Hilfritz Camallere | `hilfritz` | 64 | 12 | 78 | 5338 | 1021 | Active contributor |
+| Hilfritz Camallere | `hilfritz` | 69 | 13 | 91 | 6044 | 1527 | Active contributor |
 | Ananya Mandal | `AnanyaMandal-DataAnalyst` | 16 | 4 | 19 | 498 | 135 | Active contributor |
 | Daniyal Khan | `daniyalnkh` | 0 | 2 | 0 | 0 | 0 | Active contributor |
-| Joseph Jamoralin | `Joseph-dataanalyst` | 5 | 2 | 6 | 122 | 10 | Active contributor |
+| Joseph Jamoralin | `Joseph-dataanalyst` | 6 | 2 | 6 | 122 | 10 | Active contributor |
 
 ### Contributor Statistics
 
 | Contributor | Commits | Files Changed | Insertions | Deletions |
 |-------------|---------|---------------|------------|-----------|
-| Hilfritz Camallere | 64 | 78 | 5338 | 1021 |
+| Hilfritz Camallere | 69 | 91 | 6044 | 1527 |
 | Ananya Mandal | 16 | 19 | 498 | 135 |
-| Joseph Jamoralin | 5 | 6 | 122 | 10 |
+| Joseph Jamoralin | 6 | 6 | 122 | 10 |
 | Daniyal Khan | 0 | 0 | 0 | 0 |
 
 ### Commit Type Distribution
 
 | Type | Count |
 |------|------:|
-| docs | 40 |
-| feat | 11 |
-| fix | 7 |
-| other | 51 |
-| refactor | 7 |
+| docs | 42 |
+| feat | 12 |
+| fix | 8 |
+| other | 53 |
+| refactor | 8 |
 | test | 5 |
 
 ### File Metrics
 
 | Metric | Value |
 |--------|------:|
-| Python Files | 26 |
-| Source Files | 14 |
+| Python Files | 28 |
+| Source Files | 15 |
 | Test Files | 10 |
 | Markdown Files | 2 |
 
@@ -48,12 +48,13 @@
 
 ### Pull Request Statistics
 
-**Total Pull Requests:** 20  
-**Merged Pull Requests:** 19  
+**Total Pull Requests:** 21  
+**Merged Pull Requests:** 20  
 **Open Pull Requests:** 0
 
 | PR # | Title | State | Author |
 |------|-------|-------|--------|
+| 21 | US-15: Refactor codebase and modularize analytics functions | MERGED | hilfritz |
 | 20 | feat(US-06): Day-of-Week and Monthly Analysis with TDD + Refactor | MERGED | daniyalnkh |
 | 19 | feat(US-12): add day-of-week and monthly analysis to dashboard | MERGED | daniyalnkh |
 | 18 | US-14: Filtering Feature | MERGED | AnanyaMandal-DataAnalyst |
