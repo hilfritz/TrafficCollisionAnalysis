@@ -358,8 +358,7 @@ notebooks/
 Acceptance Criteria:
 
 - Product backlog created
-- User stories documented in README
-- Each story includes description and story points
+- Story includes description and story points
 
 ---
 
