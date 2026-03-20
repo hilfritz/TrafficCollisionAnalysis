@@ -150,9 +150,33 @@ def road_user_analysis(df: pd.DataFrame) -> pd.DataFrame:
             ],
         }
     )
-
-
 def filter_collisions(
+    df: pd.DataFrame,
+    years: list[int] | None = None,
+    hours: list[int] | None = None,
+    divisions: list[str] | None = None,
+    neighbourhoods: list[str] | None = None,
+) -> pd.DataFrame:
+    """
+    Filter the cleaned collision dataset by selected fields.
+    """
+    result = df.copy()
+
+    if years:
+        result = result[result["OCC_YEAR"].isin(years)]
+
+    if hours:
+        result = result[result["OCC_HOUR"].isin(hours)]
+
+    if divisions:
+        result = result[result["DIVISION"].isin(divisions)]
+
+    if neighbourhoods:
+        result = result[result["NEIGHBOURHOOD_158"].isin(neighbourhoods)]
+
+    return result.copy()
+
+def filter_collisionsold(
     df: pd.DataFrame,
     years: list[int] | None = None,
     divisions: list[str] | None = None,
@@ -200,6 +224,7 @@ def export_results(df: pd.DataFrame, output_path: str) -> str:
 
     return output_path
 
+ feature/US-06-time-analysis
 def collisions_by_day_of_week(df: pd.DataFrame) -> pd.DataFrame:
     """
     Aggregate collisions by day of week to identify high-risk days.
@@ -234,3 +259,35 @@ def collisions_by_month(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return result
+
+def road_user_analysis(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Analyze collisions by road user type.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Collision dataset
+
+    Returns
+    -------
+    pandas.DataFrame
+        Summary table of collisions by road user type
+    """
+
+    if "INVTYPE" not in df.columns:
+        raise ValueError("Dataset must contain INVTYPE column")
+
+    # Handle missing values
+    df["INVTYPE"] = df["INVTYPE"].fillna("Unknown")
+
+    # Count collisions by road user type
+    summary = (
+        df.groupby("INVTYPE")
+        .size()
+        .reset_index(name="collision_count")
+        .sort_values("collision_count", ascending=False)
+    )
+
+    return summary
+ main
