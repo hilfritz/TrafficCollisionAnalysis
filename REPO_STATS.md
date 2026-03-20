@@ -1,6 +1,6 @@
 ## Repository Statistics
 
-**Total Commits:** 105  
+**Total Commits:** 113  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -8,7 +8,7 @@
 
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
-| Hilfritz Camallere | `hilfritz` | 56 | 12 | 68 | 4589 | 339 | Active contributor |
+| Hilfritz Camallere | `hilfritz` | 60 | 12 | 70 | 4969 | 652 | Active contributor |
 | Ananya Mandal | `AnanyaMandal-DataAnalyst` | 16 | 4 | 19 | 498 | 135 | Active contributor |
 | Daniyal Khan | `daniyalnkh` | 0 | 2 | 0 | 0 | 0 | Active contributor |
 | Joseph Jamoralin | `Joseph-dataanalyst` | 5 | 2 | 6 | 122 | 10 | Active contributor |
@@ -17,7 +17,7 @@
 
 | Contributor | Commits | Files Changed | Insertions | Deletions |
 |-------------|---------|---------------|------------|-----------|
-| Hilfritz Camallere | 56 | 68 | 4589 | 339 |
+| Hilfritz Camallere | 60 | 70 | 4969 | 652 |
 | Ananya Mandal | 16 | 19 | 498 | 135 |
 | Joseph Jamoralin | 5 | 6 | 122 | 10 |
 | Daniyal Khan | 0 | 0 | 0 | 0 |
@@ -26,20 +26,20 @@
 
 | Type | Count |
 |------|------:|
-| docs | 36 |
-| feat | 7 |
-| fix | 6 |
-| other | 45 |
+| docs | 37 |
+| feat | 9 |
+| fix | 7 |
+| other | 48 |
 | refactor | 7 |
-| test | 4 |
+| test | 5 |
 
 ### File Metrics
 
 | Metric | Value |
 |--------|------:|
-| Python Files | 25 |
+| Python Files | 26 |
 | Source Files | 14 |
-| Test Files | 9 |
+| Test Files | 10 |
 | Markdown Files | 2 |
 
 ### Branch List
@@ -49,12 +49,12 @@
 ### Pull Request Statistics
 
 **Total Pull Requests:** 20  
-**Merged Pull Requests:** 17  
-**Open Pull Requests:** 2
+**Merged Pull Requests:** 18  
+**Open Pull Requests:** 1
 
 | PR # | Title | State | Author |
 |------|-------|-------|--------|
-| 20 | feat(US-06): Day-of-Week and Monthly Analysis with TDD + Refactor | OPEN | daniyalnkh |
+| 20 | feat(US-06): Day-of-Week and Monthly Analysis with TDD + Refactor | MERGED | daniyalnkh |
 | 19 | feat(US-12): add day-of-week and monthly analysis to dashboard | OPEN | daniyalnkh |
 | 18 | US-14: Filtering Feature | MERGED | AnanyaMandal-DataAnalyst |
 | 17 | US-09: Automated Tests | MERGED | Joseph-dataanalyst |
