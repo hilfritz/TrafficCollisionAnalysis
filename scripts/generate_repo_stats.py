@@ -13,26 +13,27 @@ OUTPUT_MD = PROJECT_ROOT / "REPO_STATS.md"
 # Official team roster
 # git_names should match the real output of:
 # git log --format="%an" | sort | uniq -c
+
 TEAM_MEMBERS = [
     {
         "name": "Hilfritz Camallere",
         "github": "hilfritz",
-        "git_names": ["Hilfritz"],
+        "git_names": ["Hilfritz", "Hil Fritz", "Hilfritz Camallere"],
     },
     {
         "name": "Ananya Mandal",
         "github": "AnanyaMandal-DataAnalyst",
-        "git_names": ["Ananya Mandal"],
+        "git_names": ["Ananya Mandal", "Ananya"],
     },
     {
         "name": "Daniyal Khan",
         "github": "daniyalnkh",
-        "git_names": ["Daniyal Khan"],
+        "git_names": ["Daniyal Khan", "Daniyal"],
     },
     {
         "name": "Joseph Jamoralin",
         "github": "Joseph-dataanalyst",
-        "git_names": ["Joseph Jamoralin"],
+        "git_names": ["Joseph Jamoralin", "Joseph"],
     },
 ]
 
@@ -447,11 +448,11 @@ def build_markdown() -> str:
     lines.append(f"| Markdown Files | {file_counts['markdown_files']} |")
     lines.append("")
 
-    lines.append("### Branch List")
-    lines.append("")
-    for branch in branches:
-        lines.append(f"- `{branch}`")
-    lines.append("")
+    #lines.append("### Branch List")
+    #lines.append("")
+    #for branch in branches:
+    #    lines.append(f"- `{branch}`")
+    #lines.append("")
 
     lines.append("### Pull Request Statistics")
     lines.append("")
