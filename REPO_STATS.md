@@ -1,8 +1,8 @@
 ## Repository Statistics
 
-**Total Commits:** 128  
+**Total Commits:** 129  
 **Total Team Members:** 4  
-**Branches Created:** 1
+**Branches Created:** 22
 
 ### Team Contribution Summary
 
@@ -10,7 +10,7 @@
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
 | Hilfritz Camallere | `hilfritz` | 69 | 13 | 91 | 6044 | 1527 | Active contributor |
 | Ananya Mandal | `AnanyaMandal-DataAnalyst` | 16 | 4 | 19 | 498 | 135 | Active contributor |
-| Daniyal Khan | `daniyalnkh` | 0 | 2 | 0 | 0 | 0 | Active contributor |
+| Daniyal Khan | `daniyalnkh` | 4 | 2 | 3 | 143 | 0 | Active contributor |
 | Joseph Jamoralin | `Joseph-dataanalyst` | 6 | 2 | 6 | 122 | 10 | Active contributor |
 
 ### Contributor Statistics
@@ -20,13 +20,13 @@
 | Hilfritz Camallere | 69 | 91 | 6044 | 1527 |
 | Ananya Mandal | 16 | 19 | 498 | 135 |
 | Joseph Jamoralin | 6 | 6 | 122 | 10 |
-| Daniyal Khan | 0 | 0 | 0 | 0 |
+| Daniyal Khan | 4 | 3 | 143 | 0 |
 
 ### Commit Type Distribution
 
 | Type | Count |
 |------|------:|
-| docs | 42 |
+| docs | 43 |
 | feat | 12 |
 | fix | 8 |
 | other | 53 |
@@ -37,14 +37,10 @@
 
 | Metric | Value |
 |--------|------:|
-| Python Files | 28 |
-| Source Files | 15 |
-| Test Files | 10 |
-| Markdown Files | 2 |
-
-### Branch List
-
-- `main`
+| Python Files | 6671 |
+| Source Files | 16 |
+| Test Files | 2377 |
+| Markdown Files | 19 |
 
 ### Pull Request Statistics
 
