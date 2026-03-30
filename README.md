@@ -710,7 +710,7 @@ refactor(US-06): improve validation logic
 <!-- REPO-STATS:START -->
 ## Repository Statistics
 
-**Total Commits:** 142  
+**Total Commits:** 145  
 **Total Team Members:** 4  
 **Branches Created:** 1
 
@@ -718,7 +718,7 @@ refactor(US-06): improve validation logic
 
 | Team Member | GitHub Username | Commits | PRs | Files Changed | Insertions | Deletions | Status |
 |-------------|-----------------|---------|-----|---------------|------------|-----------|--------|
-| Hilfritz Camallere | `hilfritz` | 70 | 14 | 96 | 6063 | 1645 | Active contributor |
+| Hilfritz Camallere | `hilfritz` | 72 | 15 | 102 | 6829 | 1665 | Active contributor |
 | Ananya Mandal | `AnanyaMandal-DataAnalyst` | 16 | 4 | 19 | 498 | 135 | Active contributor |
 | Daniyal Khan | `daniyalnkh` | 5 | 2 | 3 | 143 | 0 | Active contributor |
 | Joseph Jamoralin | `Joseph-dataanalyst` | 6 | 2 | 6 | 122 | 10 | Active contributor |
@@ -727,7 +727,7 @@ refactor(US-06): improve validation logic
 
 | Contributor | Commits | Files Changed | Insertions | Deletions |
 |-------------|---------|---------------|------------|-----------|
-| Hilfritz Camallere | 70 | 96 | 6063 | 1645 |
+| Hilfritz Camallere | 72 | 102 | 6829 | 1665 |
 | Ananya Mandal | 16 | 19 | 498 | 135 |
 | Joseph Jamoralin | 6 | 6 | 122 | 10 |
 | Daniyal Khan | 5 | 3 | 143 | 0 |
@@ -736,10 +736,10 @@ refactor(US-06): improve validation logic
 
 | Type | Count |
 |------|------:|
-| docs | 54 |
+| docs | 55 |
 | feat | 12 |
 | fix | 9 |
-| other | 54 |
+| other | 56 |
 | refactor | 8 |
 | test | 5 |
 
@@ -747,19 +747,20 @@ refactor(US-06): improve validation logic
 
 | Metric | Value |
 |--------|------:|
-| Python Files | 28 |
+| Python Files | 30 |
 | Source Files | 15 |
 | Test Files | 10 |
 | Markdown Files | 2 |
 
 ### Pull Request Statistics
 
-**Total Pull Requests:** 22  
-**Merged Pull Requests:** 21  
+**Total Pull Requests:** 23  
+**Merged Pull Requests:** 22  
 **Open Pull Requests:** 0
 
 | PR # | Title | State | Author |
 |------|-------|-------|--------|
+| 23 | refactor-US-15-refactor codes like color | MERGED | hilfritz |
 | 22 | fix(US-15): clean repository, update .gitignore, and improve stats generation | MERGED | hilfritz |
 | 21 | US-15: Refactor codebase and modularize analytics functions | MERGED | hilfritz |
 | 20 | feat(US-06): Day-of-Week and Monthly Analysis with TDD + Refactor | MERGED | daniyalnkh |
