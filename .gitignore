@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
 data/traffic_collisions.csv
-data/processed/
+data/processed/*
+!data/processed/traffic_collisions_prepared.parquet
 outputs/
 output/
 .venv/
