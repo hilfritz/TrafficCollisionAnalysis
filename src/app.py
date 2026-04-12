@@ -1,16 +1,29 @@
 # src/app.py
 
 from pathlib import Path
-from src.common import log_timed_block, reset_log, log_message, benchmark_call
+
+from common import log_timed_block, reset_log, log_message, benchmark_call
+from config import OUTPUT_DIR
+from analytics import (
+    collision_severity_analysis,
+    collisions_by_day_of_week,
+    collisions_by_division,
+    collisions_by_hour,
+    collisions_by_month,
+    collisions_by_neighbourhood,
+    forecast_collision_trend,
+    road_user_analysis,
+    severity_trend_over_time,
+    total_collisions_trend_over_time,
+)
+
+
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import altair as alt
 import pandas as pd
 import pydeck as pdk
 import streamlit as st
 import streamlit.components.v1 as components
-
-from src.config import OUTPUT_DIR
-from src.analytics import collision_severity_analysis, collisions_by_day_of_week, collisions_by_division, collisions_by_hour, collisions_by_month, collisions_by_neighbourhood, forecast_collision_trend, road_user_analysis, severity_trend_over_time, total_collisions_trend_over_time
 
 # Dashboard with day-of-week and monthly analysis (US-12)
 
