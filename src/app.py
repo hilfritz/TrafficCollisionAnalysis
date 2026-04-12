@@ -24,6 +24,8 @@ import pandas as pd
 import pydeck as pdk
 import streamlit as st
 import streamlit.components.v1 as components
+import plotly.express as px
+from src.config import ChartConfig, Severity
 
 # Dashboard with day-of-week and monthly analysis (US-12)
 
@@ -269,15 +271,15 @@ def build_map(filtered_df: pd.DataFrame, map_mode: str, map_style_option: str):
     spread = max(lat_range, lon_range)
 
     if spread < 0.01:
-        zoom = 14
+        zoom = 16
     elif spread < 0.05:
-        zoom = 13
+        zoom = 15
     elif spread < 0.1:
-        zoom = 12
+        zoom = 14
     elif spread < 0.5:
-        zoom = 11
+        zoom = 13
     else:
-        zoom = 10
+        zoom = 12
     end_center()
 
     color_map = get_severity_color_map()
@@ -910,13 +912,33 @@ def main() -> None:
 
     with col1:
         st.subheader("Hourly Distribution")
+
         if not hourly_df.empty:
-            end_bar = log_timed_block("st.bar_chart.hourly")
-            st.bar_chart(
-                hourly_df.sort_values("OCC_HOUR").set_index("OCC_HOUR")["collision_count"],
-                height=300,
+            end_chart = log_timed_block("st.line_chart.hourly")
+
+            # Sort and rename for clean chart
+            hourly_chart_df = hourly_df.sort_values("OCC_HOUR").copy()
+            hourly_chart_df = hourly_chart_df.rename(
+                columns={
+                    "OCC_HOUR": "Hour",
+                    "collision_count": "Collisions"
+                }
             )
-            end_bar()
+
+            # Line chart (Total only, blue)
+            chart = (
+                alt.Chart(hourly_chart_df)
+                .mark_line(point=True, color=ChartConfig.TOTAL_COLOR)  # 🔵 Total
+                .encode(
+                    x=alt.X("Hour:Q", title="Hour of Day"),
+                    y=alt.Y("Collisions:Q", title="Collision Count"),
+                    tooltip=["Hour:Q", "Collisions:Q"],
+                )
+            )
+
+            st.altair_chart(chart, use_container_width=True)
+
+            end_chart()
         else:
             st.info("No hourly data available for the current filter selection.")
 
@@ -933,22 +955,82 @@ def main() -> None:
     # Row 3: Day of Week + Month + Top Divisions
     col3, col4, col5 = st.columns(3, gap="large")
 
+    # with col3:
+    #     st.subheader("Week Day Distribution")
+    #     if not day_of_week_df.empty:
+    #         end_bar = log_timed_block("st.bar_chart.day_of_week")
+    #         st.bar_chart(day_of_week_df.set_index("day_of_week")["collision_count"])
+            
+    #         end_bar()
+    #     else:
+    #         st.info("No day-of-week data available for the current filter selection.")
     with col3:
         st.subheader("Week Day Distribution")
         if not day_of_week_df.empty:
-            end_bar = log_timed_block("st.bar_chart.day_of_week")
-            st.bar_chart(day_of_week_df.set_index("day_of_week")["collision_count"])
-            
-            end_bar()
+            end_chart = log_timed_block("st.altair_chart.day_of_week")
+
+            weekday_chart_df = day_of_week_df.copy()
+            weekday_chart_df = weekday_chart_df.rename(
+                columns={
+                    "day_of_week": "Day",
+                    "collision_count": "Collisions"
+                }
+            )
+
+            chart = (
+                alt.Chart(weekday_chart_df)
+                .mark_bar(color=ChartConfig.TOTAL_COLOR)
+                #.mark_bar(color=ChartConfig.severity_color(Severity.FATAL))
+                .encode(
+                    x=alt.X("Day:N", title="Day of Week", sort=[
+                        "Monday", "Tuesday", "Wednesday", "Thursday",
+                        "Friday", "Saturday", "Sunday"
+                    ],  axis=alt.Axis(labelAngle=340)),
+                    y=alt.Y("Collisions:Q", title="Collision Count"),
+                    tooltip=["Day:N", "Collisions:Q"],
+                )
+            )
+
+            st.altair_chart(chart, use_container_width=True)
+            end_chart()
         else:
             st.info("No day-of-week data available for the current filter selection.")
-
+    # with col4:
+    #     st.subheader("Monthly Distribution")
+    #     if not month_df.empty:
+    #         end_bar = log_timed_block("st.bar_chart.month")
+    #         st.bar_chart(month_df.set_index("month_name")["collision_count"])
+    #         end_bar()
+    #     else:
+    #         st.info("No monthly data available for the current filter selection.")
     with col4:
         st.subheader("Monthly Distribution")
         if not month_df.empty:
-            end_bar = log_timed_block("st.bar_chart.month")
-            st.bar_chart(month_df.set_index("month_name")["collision_count"])
-            end_bar()
+            end_chart = log_timed_block("st.altair_chart.month")
+
+            month_chart_df = month_df.copy()
+            month_chart_df = month_chart_df.rename(
+                columns={
+                    "month_name": "Month",
+                    "collision_count": "Collisions"
+                }
+            )
+
+            chart = (
+                alt.Chart(month_chart_df)
+                .mark_bar(color=ChartConfig.TOTAL_COLOR)
+                .encode(
+                    x=alt.X("Month:N", title="Month", sort=[
+                        "January", "February", "March", "April", "May", "June",
+                        "July", "August", "September", "October", "November", "December"
+                    ], axis=alt.Axis(labelAngle=340)),
+                    y=alt.Y("Collisions:Q", title="Collision Count"),
+                    tooltip=["Month:N", "Collisions:Q"],
+                )
+            )
+
+            st.altair_chart(chart, use_container_width=True)
+            end_chart()
         else:
             st.info("No monthly data available for the current filter selection.")
 
@@ -957,7 +1039,7 @@ def main() -> None:
         if not division_df.empty:
             end_df = log_timed_block("st.dataframe.divisions")
             st.dataframe(
-                division_df.head(5),
+                division_df,
                 use_container_width=True,
                 hide_index=True,
                 height=260,
