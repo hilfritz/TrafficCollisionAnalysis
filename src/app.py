@@ -25,7 +25,7 @@ import pydeck as pdk
 import streamlit as st
 import streamlit.components.v1 as components
 import plotly.express as px
-from src.config import ChartConfig, Severity
+from config import ChartConfig, Severity
 
 # Dashboard with day-of-week and monthly analysis (US-12)
 

@@ -1,7 +1,7 @@
 # src/analytics.py
 import pandas as pd
 import os
-from src.common import log_timed_block, reset_log, log_message, benchmark_call
+from common import log_timed_block, reset_log, log_message, benchmark_call
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 
 def _require_columns(df: pd.DataFrame, required_columns: list[str]) -> None:
