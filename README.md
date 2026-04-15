@@ -787,4 +787,12 @@ refactor(US-06): improve validation logic
 <!-- REPO-STATS:END -->
 ---
 
+## Project Team
+
+This project was collaboratively developed during a two-week Agile sprint at the University of Niagara Falls (Master of Data Analytics — Winter 2026).
+
+- **Hilfritz Camallere**  
+- **Ananya Mandal**  
+- **Daniyal Khan**  
+- **Joseph Jamoralin**  
 
