@@ -1,5 +1,6 @@
 
 # Toronto Traffic Collision Analytics Tool
+- [Live Demo](https://collisiondashboard.streamlit.app/)
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![Tests](https://img.shields.io/badge/Tests-pytest-green)
